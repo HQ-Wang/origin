@@ -1,0 +1,144 @@
+//********************************************************************************;
+//this program is used to average the "fitd2o" and "h2o/d2o"
+
+
+
+
+//********************************************************************************
+range workbooknow=[book1];//modify every time;
+int ndata=1;//numbers of data used to do summation. modify every time;
+//dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};
+dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
+nvol=listvol.getsize();
+ph=11.5;//set pH value.modify every time.;
+string samp1$="20160114si100d10(smooth)";//set the serial number of your sample.modify every time.;
+string samp2$="20140908si100d4";//set the serial number of your sample.modify every time.;
+string samp3$="20141006si100d3ots";
+workbooknow.longname$="new_mean_ph$(ph)_si100d(smooth)";//modify every time;
+string sheeta$="fitd2o";
+string sheetb$="h2o/d2o";
+nonwn=3750;//wavenumber at nonresident range.;
+
+
+//...................................................................................................
+//this part below only can be uesd once, which is uesd to create new sheets.;
+for(i=0;i<ndata;i++)
+{
+	page.active=$(1+i*2);
+	wks.name$=samp$(i+1)$+sheeta$;
+	page.active=$(2+i*2);
+	wks.name$=samp$(i+1)$+sheetb$;
+}
+newsheet name:=sheeta$;
+newsheet name:=sheetb$;
+
+//.........................................................................................;
+//calculate the mean and SE of the datas of "fitd2o".
+range volt=$(ndata*2+1)!wcol(1);
+range temp=1!wcol(nvol+2);
+volt=temp;
+volt[l]$=temp[l]$;volt[u]$=temp[u]$;
+for(jj=0;jj<ndata;jj++)
+{
+	range data=$(ndata*2+1)!wcol(2+jj);
+	range temp=$(jj*2+1)!wcol(nvol+3);
+	data=temp;
+	data[l]$=temp[l]$+samp$(jj+1)$;data[c]$=temp[c]$+"_"+samp$(jj+1)$;
+}
+rowstats irng:=$(ndata*2+1)!wcol(2):wcol(1 +ndata) mean:=$(ndata*2+1)!wcol(2+ndata) sd:=$(ndata*2+1)!wcol(3+ndata);
+range mean=$(ndata*2+1)!wcol(2+ndata);
+range temp=1!wcol(nvol+3);
+mean[l]$=temp[l]$;mean[c]$="mean_"+temp[c]$;
+range sd=$(ndata*2+1)!wcol(3+ndata);
+sd=sd/(ndata)^0.5;
+sd[l]$=sd;sd[c]$="SE_"+temp[c]$;
+if(ndata==1)
+{
+	sd=volt*0;
+}
+
+for(jj=0;jj<ndata;jj++)
+{
+	range data=$(ndata*2+1)!wcol(2+ndata+4+jj);
+	range temp=$(jj*2+1)!wcol(nvol+3+3);
+	data=temp;
+	data[l]$=temp[l]$+samp$(jj+1)$;data[c]$=temp[c]$+"_"+samp$(jj+1)$;
+}
+rowstats irng:=$(ndata*2+1)!wcol(2+ndata+4):wcol(1 +ndata+4+ndata) mean:=$(ndata*2+1)!wcol(2+ndata+4+ndata) sd:=$(ndata*2+1)!wcol(3+ndata+4+ndata);
+range mean=$(ndata*2+1)!wcol(2+ndata+4+ndata);
+range temp=1!wcol(nvol+3+3);
+mean[l]$=temp[l]$;mean[c]$="mean_para 'b'";
+range sd=$(ndata*2+1)!wcol(3+ndata+4+ndata);
+sd=sd/(ndata)^0.5;
+sd[l]$=sd;sd[c]$="SE_"+temp[c]$;
+if(ndata==1)
+{
+	sd=volt*0;
+}
+//¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­.;
+//do parabolic fitting to the areas of gauss fitting above 
+range vol=sheeta$!col(1);
+range area=sheeta$!col($(ndata+2));
+range ix=vol;
+range iy=area;
+range fit=sheeta$!col($(ndata+4));
+range coef=sheeta$!col($(ndata+5));
+fitpoly (ix,iy) 2 0 0 coef (ix,fit);
+a=coef[1];//a+bx+cx^2
+b=coef[2];
+c=coef[3];
+d=-b/2/c;//c(x-d)^2+e
+e=a-b*b/4/c;
+coef[4]=d;
+coef[5]=e;
+fit[l]$=area[l]$;fit[c]$="fit_"+area[c]$;
+coef[c]$=Polynomial Coefficients[1-5=a-e](a+bx+cx^2,c(x-d)^2+e);
+
+//.....................................................................................................;
+//calculate the mean and SE of the datas of "h2o/d2o".
+range waven=$(ndata*2+2)!wcol(1);
+range temp=2!wcol(1);
+waven=temp;
+waven[l]$=temp[l]$;waven[u]$=temp[u]$;
+for(ii=0;ii<nvol;ii++)
+{
+for(jj=0;jj<ndata;jj++)
+{
+range data=$(ndata*2+2)!wcol(2+jj+ii*(ndata+2));
+range temp=$(jj*2+2)!wcol(2+ii);
+data=temp;
+data[l]$=temp[l]$+samp$(jj+1)$;data[c]$=temp[c]$+"_"+samp$(jj+1)$;
+}
+rowstats irng:=$(ndata*2+2)!wcol(2+ii*(ndata+2)):wcol(1+ii*(ndata+2)+ndata) mean:=$(ndata*2+2)!wcol(2+ii*(ndata+2)+ndata) sd:=$(ndata*2+2)!wcol(3+ii*(ndata+2)+ndata);
+range mean=$(ndata*2+2)!wcol(2+ii*(ndata+2)+ndata);
+range temp=2!wcol(2+ii);
+mean[l]$=temp[l]$;mean[c]$="mean_"+temp[c]$;
+range sd=$(ndata*2+2)!wcol(3+ii*(ndata+2)+ndata);
+sd=sd/(ndata)^0.5;
+sd[l]$=sd;sd[c]$="SE_"+temp[c]$;
+}
+//...............................................................................................................;
+//get the ratio c based on the data in nonresident range
+range wn=$(ndata*2+2)!col(1);
+int nnn;
+for(ii=0;ii<$(wn.getsize()-1);ii+=2)
+{
+aaa=abs(wn[$(ii+1)]-nonwn);
+bbb=abs(wn[$(ii+2)]-nonwn);
+ccc=bbb-aaa;
+if(ccc>=0)
+{
+nnn=ii+1;
+break;
+}
+}
+range non=$(ndata*2+1)!wcol(ndata*2+8);
+non[l]$="ratio c";non[c]$="ratio of X\+((2))\-(si-h2o)/ X\+((2))\-(si-d2o) in nonresident range";
+for(ii=0;ii<nvol;ii++)
+{
+range temp=$(ndata*2+2)!col($(2+ndata+ii*(ndata+2)));
+ddd=temp[$(nnn)];
+non[$(ii+1)]=$(ddd^0.5);//the value of "c" in the nonlinear fitting about water features.
+}
+//...........................................................................
+
