@@ -2,7 +2,7 @@
 //This program is used to fit the d2o curve at different voltages with gaussion mode
 //************************************************************************************************
 //choose the d2o's data which used to do gaussion fitting
-ph=5.8;//ph value.
+//ph=5.8;//ph value.
 dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 //dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
 //dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
