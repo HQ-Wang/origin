@@ -1,0 +1,46 @@
+//*************************************************************************;
+//This program is used to get the CV curve from raw data
+//*************************************************************************
+//run only once
+newsheet name:="current";
+//........................................................................
+string workbook_now$="book9";//set the workbook where you need to operate
+string workbook_ori$="book8";//set the original workbook where raw data come.
+CV_gain=7;//set the gain level;
+nd2o=2;//set the cycle times;
+//..........................................................................
+string sheet1$="current";
+page.active$=sheet1$;//d2o;
+switch(CV_gain)
+{
+	case 3:
+	amp=0.001;
+	break;
+	case 4:
+	amp=0.01;
+	break;
+	case 5:
+	amp=0.108;
+	break;
+	case 6:
+	amp=1.072;
+	break;
+	case 7:
+	amp=10.974;
+	break;
+}
+for(i=0;i<nd2o;i++)
+{
+	range voltage=wcol(i*7+1);
+	range temp=[workbook_ori$]sheet1$!wcol(i*7+1);
+	voltage=temp;
+	voltage[l]$=temp[l]$;voltage[u]$=temp[u]$;voltage[c]$=temp[c]$;
+	for(j=0;j<4;j++)
+	{
+		range current=wcol(i*7+j+2);
+		range temp=[workbook_ori$]sheet1$!wcol(i*7+j+2);
+		current=temp/amp;
+		current[l]$=temp[l]$;current[u]$=uA;current[c]$=temp[c]$;
+	}
+}
+

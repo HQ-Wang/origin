@@ -1,0 +1,12 @@
+ph=5.8;
+string date$="20160310";
+string tbook$="book7";
+string name$="ph$(ph)_(-1.2_0.4).dat";
+string samp$=date$+"_si100d10(smooth)";
+//...............................................................................................
+string path$="D:\fudan\study\experiment\electrochemistry\origin data\export file\"+date$+"\ph$(ph)\";
+string sheetd2o$="fitd2o1";
+string sheetdh$="h2o/d2o";
+//............................................................................................
+expASC iw:=[tbook$]sheetd2o$ type:=0 path:=path$+samp$+"_1-d2o_"+name$ separator:=TAB;
+expASC iw:=[tbook$]sheetdh$ type:=0 path:=path$+samp$+"_2-h2o-d2o_"+name$ separator:=TAB;

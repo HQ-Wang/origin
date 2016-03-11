@@ -1,0 +1,31 @@
+//*************************************************************************;
+//This program is used to get the qz reference from raw data
+//*************************************************************************;
+//set parameters;
+string workbook_ori$="book8";//set the original workbook where raw data come.
+string workbook_now$="book9";//set the workbook where you need to operate
+string sample$="qz-h2o ";
+string polar$="ssp ";
+string col_ori_wavelength$="a";//set the colume of wavelength in original qz sheet
+string col_ori_qz$="c";//set the colume of data in original qz sheet
+time_qz=5;//intergrated time of qz (s);
+energy_ir=7.2;//ir energy (mW)
+energy_800=11;//800 energy (mW)
+xgroup=4;//x group setted in CCD;
+//*************************************************************************
+//run only once
+newsheet name:="quartz";
+
+//..........................................................................
+string sheet1$="quartz";
+page.active$=sheet1$;
+range waven=col(1);
+range temp=[workbook_ori$]sheet1$!col(col_ori_wavelength$);
+waven=(1/temp-1/800)*10000000;
+waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=temp[c]$;
+
+range temp=[workbook_ori$]sheet1$!col(col_ori_qz$);
+range data=col(2);
+data=temp/time_qz;
+data[l]$=temp[l]$;data[c]$=polar$+sample$+"ir$(energy_ir) vis$(energy_800) group$(xgroup) 1s";
+

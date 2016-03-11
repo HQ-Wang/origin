@@ -1,0 +1,99 @@
+//**********************************************************************;
+//This program is used to set all kinds of names, like long name, units, comments, sheet names and so on for raw data.;
+//The sheets of raw data should be imported as following order: 1st d2o raw data; 1st h2o raw data; 2nd d2o raw data;2nd h2o raw data;...at last is quartz
+//And in each sheet, data should be arranged as: 1st colume: wavelength(nm); next: ir raw data; next: 800 raw data; next: sfg raw data at different voltages.;
+//***********************************************************************
+range rpage=[book8];//set the workbook which will be edited.
+string samp$="si100d10(scratched)";//set the serial number of your sample.modify every time.;
+ph=5.8;//set pH value.modify every time.;
+string polar$="ssp_";//polarizer combination
+energy_ir=7.4;//ir energy (mW)
+energy_800=11;//800 energy (mW)
+tps=1;//time per spectrum of sample(minutes);
+xgroup=4;//x group setted in CCD
+scan_speed=50;//scan speed setted in CV (mV/s) 
+string test_order$="d2o->h2o";//the test order
+nd2o=2;//set the cycle times
+dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//set values of different voltages at first cycle;
+dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
+dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
+nspec1=4;//set the number of spectra in each voltage at first cycle.	
+nspec2=9;
+nspec3=nspec1;
+CV_gain=7;//set the gain level;
+
+tps_qz=5;//time per spectrum of quartz(s);
+xgroup_qz=4;//x group setted in CCD at quartz measurement;
+energy_ir_qz=7.2;//ir energy at quartz measurement(mW)
+energy_800_qz=11;//800 energy at quartz measurement(mW);
+//****************************************************************;
+// run only once;
+//add the sheets for spectra data
+for(i=0;i<nd2o;i++)
+{
+	newsheet name:="d2o$(i+1)";
+	newsheet name:="h2o$(i+1)";
+}
+//add the sheet for current data;
+//1st col: d2o; 2nd col: h2o
+newsheet name:="current";
+newsheet name:="quartz";
+layer -d "sheet";
+
+//*****************************************************************;
+rpage.longname$="raw data "+polar$+samp$+"_ph$(ph)_ir$(energy_ir)mw(gase)-vis$(energy_800)mw_$(tps)min_$(xgroup)_$(scan_speed)mvs-1_"+test_order$;//modify every time
+for(i=0;i<nd2o;i++)
+{
+	string sheet1$="d2o$(i+1)";
+	string sheet2$="h2o$(i+1)";
+	page.active$=sheet1$;//d2o;
+	nvol=$(listvol$(i+1).getsize());
+	col(1)[l]$=wavelength;col(1)[u]$=nm;col(1)[c]$=samp$+"/d2o-ph$(ph)";//modify every time.
+	col(2)[l]$=counts;col(2)[c]$=ir-$(tps)min;
+	col($(2+$(nspec$(i+1))))[l]$=counts;col($(2+$(nspec$(i+1))))[c]$=800-$(tps)min;
+	for(jj=0;jj<nvol;jj++)
+	{
+		if(jj==0)
+		{
+			col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[l]$=counts;col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[c]$=d2o_$(listvol$(i+1)[jj+1],%2.1f)v;
+		}
+		else
+		{
+			col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[l]$=counts;col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[c]$=d2o_$(listvol$(i+1)[jj],%2.1f)vto$(listvol$(i+1)[jj+1],%2.1f)v;
+		}
+	}
+	col($(nvol*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[l]$=counts;col($(nvol*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[c]$=d2o_open circuit;
+
+	page.active$=sheet2$;//h2o-detail;
+	col(1)[l]$=wavelength;col(1)[u]$=nm;col(1)[c]$=samp$+"/h2o-ph$(ph)";
+	col(2)[l]$=counts;col(2)[c]$=ir-$(tps)min;
+	col($(2+$(nspec$(i+1))))[l]$=counts;col($(2+$(nspec$(i+1))))[c]$=800-$(tps)min;
+	for(jj=0;jj<nvol;jj++)
+	{
+		if(jj==0)
+		{
+			col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[l]$=counts;col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[c]$=h2o_$(listvol$(i+1)[jj+1],%2.1f)v;
+		}
+		else
+		{
+			col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[l]$=counts;col($(jj*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[c]$=h2o_$(listvol$(i+1)[jj],%2.1f)vto$(listvol$(i+1)[jj+1],%2.1f)v;
+		}
+	}
+	col($(nvol*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[l]$=counts;col($(nvol*$(nspec$(i+1))+2*$(nspec$(i+1))+2))[c]$=h2o_open circuit;
+
+}
+//********************************************************************;
+page.active$="current";
+for(i=0;i<nd2o;i++)
+{
+	wcol(i*7+1)[l]$=voltage;wcol(i*7+1)[u]$=V;wcol(i*7+1)[c]$=cycle$(nd2o);
+	wcol(i*7+2)[l]$=current;wcol(i*7+2)[u]$=V;wcol(i*7+2)[c]$="d2o-gain$(CV_gain)";
+	wcol(i*7+3)[l]$=current;wcol(i*7+3)[u]$=V;wcol(i*7+3)[c]$="d2o-gain$(CV_gain)-SD";
+	wcol(i*7+4)[l]$=current;wcol(i*7+4)[u]$=V;wcol(i*7+4)[c]$="h2o-gain$(CV_gain)";
+	wcol(i*7+5)[l]$=current;wcol(i*7+5)[u]$=V;wcol(i*7+5)[c]$="h2o-gain$(CV_gain)-SD";
+}
+//****************************************************************************;
+page.active$="quartz";
+col(1)[l]$=wavelength;col(1)[u]$=nm;
+col(3)[l]$=counts;col(3)[c]$=polar$+"qz/h2o-ph$(ph)-$(tps_qz)s-ir$(energy_ir_qz)mW-vis$(energy_800_qz)mW";
+

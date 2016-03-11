@@ -1,0 +1,255 @@
+//*************************************************************************************
+//This program is used to average the raw data from d2o and h2o 
+//And calculate the ratio "h2o/d2o";
+//1,set all parameters at first part; 2,run second part once to build sheets;3, run third part to get data;
+
+//first part*************************************************************************************
+range rpage=[book9];//set the workbook where you need to operate
+string workbook_ori$="book8";//set the original workbook where raw data come.
+string samp$="si100d10(scratched)";//set the serial number of your sample.modify every time.;
+ph=5.8;//set pH value.modify every time.;
+string polar$="ssp";//polarizer combination
+energy_ir=7.4;//ir energy (mW)
+energy_800=11;//800 energy (mW)
+tps=1;//time per spectrum(minutes)
+xgroup=4;//x group setted in CCD
+scan_speed=50;//scan speed setted in CV (mV/s) 
+string test_order$="d2o->h2o";//the test order
+
+nd2o=2;//set the cycle times
+dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//set values of different voltages at first cycle;
+dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
+dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
+nspec1=4;//set the number of spectra in each voltage at first cycle;
+nspec2=9;
+nspec3=4;
+nvol1=listvol1.getsize();
+nvol2=listvol2.getsize();
+nvol3=listvol3.getsize();
+
+//second part...................................................................................................
+//this part below only can be uesd once, which is uesd to create new sheets.;
+for(i=0;i<nd2o;i++)
+{
+	newsheet name:="d2o$(i+1)";
+	newsheet name:="h2o$(i+1)";
+	if(i>0&&i==nd2o-1)
+	{
+		newsheet name:="d2o";
+		newsheet name:="h2o";
+	}
+}
+layer -d "sheet1";
+newsheet name:="h2o/d2o";
+
+//third part.........................................................................................
+rpage.longname$=polar$+"_"+samp$+"_ph$(ph)_ir$(energy_ir)mw(gase)-vis$(energy_800)mw_$(tps)min_$(xgroup)_$(scan_speed)mvs-1_"+test_order$;
+//read data from raw data: d2o1/h2o1/d2o2/h2o2...
+for(kk=0;kk<nd2o;kk++)
+{
+	string sheet1$="d2o$(kk+1)";
+	string sheet2$="h2o$(kk+1)";
+	page.active$=sheet1$;//d2o;
+	range waven=col(1);
+	range temp=[workbook_ori$]sheet1$!col(1);
+	waven=(1/temp-1/800)*10000000;
+	waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=temp[c]$;
+	range ir=col(2);
+	range vis=col(3);
+	ir=waven*0;
+	vis=ir;
+	for(jj=0;jj<nspec$(kk+1);jj++)
+	{
+		range tir=[workbook_ori$]sheet1$!col($(2+jj));
+		ir+=tir;
+		range tvis=[workbook_ori$]sheet1$!col($(2+nspec$(kk+1)+jj));
+		vis+=tvis;
+		if(jj==0)
+		{
+			ir[l]$=tir[l]$;ir[c]$=tir[c]$+"_1min";
+			vis[l]$=tvis[l]$;vis[c]$=tvis[c]$+"_1min";
+		}
+		if(jj==nspec$(kk+1)-1)
+		{
+			ir=ir/nspec$(kk+1)/$(tps);
+			vis=vis/nspec$(kk+1)/$(tps);
+		}
+	}
+	for(ii=0;ii<nvol$(kk+1);ii++)//copy data at different voltages.
+	{
+		range data=col($(ii+4));
+		data=waven*0;
+		for(jj=0;jj<nspec$(kk+1);jj++)//sum all spectra at the same voltage.
+		{
+			range temp=[workbook_ori$]sheet1$!col($(2+2*nspec$(kk+1)+ii*nspec$(kk+1)+jj));
+			data+=temp;
+			if(jj==0)//label.
+			{
+				data[l]$=temp[l]$;data[c]$="pure_"+temp[c]$+"_1min";
+			}
+			if(jj==nspec$(kk+1)-1)
+			{
+				data=data/nspec$(kk+1)/$(tps);
+			}
+		}
+		data=data-ir-vis;
+		range sfgsmo=col($(ii+nvol$(kk+1)+4));
+		smooth iy:=data meth:=aa npts:=3 oy:=(waven,sfgsmo);
+		sfgsmo[l]$=counts;sfgsmo[c]$="smo_"+col($(ii+4))[c]$;
+	}
+
+	page.active$=sheet2$;//h2o;
+	range waven=col(1);
+	range temp=[workbook_ori$]sheet2$!col(1);
+	waven=(1/temp-1/800)*10000000;
+	waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=temp[c]$;
+	range ir=col(2);
+	range vis=col(3);
+	ir=waven*0;
+	vis=ir;
+	for(jj=0;jj<nspec$(kk+1);jj++)
+	{
+		range tir=[workbook_ori$]sheet2$!col($(2+jj));
+		ir+=tir;
+		range tvis=[workbook_ori$]sheet2$!col($(2+nspec$(kk+1)+jj));
+		vis+=tvis;
+		if(jj==0)
+		{
+			ir[l]$=tir[l]$;ir[c]$=tir[c]$+"_1min";
+			vis[l]$=tvis[l]$;vis[c]$=tvis[c]$+"_1min";
+		}
+		if(jj==nspec$(kk+1)-1)
+		{
+			ir=ir/nspec$(kk+1)/$(tps);
+			vis=vis/nspec$(kk+1)/$(tps);
+		}
+	}
+	for(ii=0;ii<nvol$(kk+1);ii++)
+	{
+		range data=col($(ii+4));
+		data=waven*0;
+		for(jj=0;jj<nspec$(kk+1);jj++)
+		{
+			range temp=[workbook_ori$]sheet2$!col($(2+2*nspec$(kk+1)+ii*nspec$(kk+1)+jj));
+			data+=temp;
+			if(jj==0)
+			{
+				data[l]$=temp[l]$;data[c]$="pure_"+temp[c]$+"_1min";
+			}
+			if(jj==nspec$(kk+1)-1)
+			{
+				data=data/nspec$(kk+1)/$(tps);
+			}
+		}
+		data=data-ir-vis;
+		range sfgsmo=col($(ii+nvol$(kk+1)+4));
+		smooth iy:=data meth:=aa npts:=3 oy:=(waven,sfgsmo);
+		sfgsmo[l]$=counts;sfgsmo[c]$="smo_"+col($(ii+4))[c]$;
+	}
+}
+
+//if numbers of cycles of d2o/h2o >=2, sum and make an average for all data.
+if(nd2o>1)
+{
+	string sheet1$="d2o";
+	string sheet2$="h2o";
+	page.active$=sheet1$;//d2o;
+	range waven=col(1);
+	range temp=d2o1!col(1);
+	waven=temp;
+	waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=temp[c]$;
+	for(ii=0;ii<nvol1;ii++)
+	{
+		range data=col($(ii+2));
+		range temp=d2o1!col($(ii+4));
+		data=temp;
+		data[l]$=temp[l]$;data[c]$=temp[c]$;
+	}
+	for(ii=0;ii<nvol1;ii++)
+	{
+		for(jj=0;jj<nd2o-1;jj++)
+		{
+			if(listvol$(jj+2)[1]==listvol1[ii+1]&&listvol$(jj+2)[nvol$(jj+2)]==listvol1[ii+nvol$(jj+2)])
+			{
+				for(kk=0;kk<nvol$(jj+2);kk++)
+				{
+					range data=col($(ii+2+kk));
+					range temp=d2o$(jj+2)!col($(kk+4));
+					data+=temp;
+					data=data/2;
+				}
+			}
+		}
+		range sfgsmo=col($(ii+nvol1+2));
+		smooth iy:=col($(ii+2)) meth:=aa npts:=3 oy:=(waven,sfgsmo);
+		sfgsmo[l]$=counts;sfgsmo[c]$="smo_"+col($(ii+2))[c]$;
+	}
+
+	page.active$=sheet2$;//h2o;
+	range waven=col(1);
+	range temp=h2o1!col(1);
+	waven=temp;
+	waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=temp[c]$;
+	for(ii=0;ii<nvol1;ii++)
+	{
+		range data=col($(ii+2));
+		range temp=h2o1!col($(ii+4));
+		data=temp;
+		data[l]$=temp[l]$;data[c]$=temp[c]$;
+	}
+	for(ii=0;ii<nvol1;ii++)
+	{
+		for(jj=0;jj<nd2o-1;jj++)
+		{
+			if(listvol$(jj+2)[1]==listvol1[ii+1]&&listvol$(jj+2)[nvol$(jj+2)]==listvol1[ii+nvol$(jj+2)])
+			{
+				for(kk=0;kk<nvol$(jj+2);kk++)
+				{
+					range data=col($(ii+2+kk));
+					range temp=h2o$(jj+2)!col($(kk+4));
+					data+=temp;
+					data=data/2;
+				}
+			}
+		}
+		range sfgsmo=col($(ii+nvol1+2));
+		smooth iy:=col($(ii+2)) meth:=aa npts:=3 oy:=(waven,sfgsmo);
+		sfgsmo[l]$=counts;sfgsmo[c]$="smo_"+col($(ii+2))[c]$;
+	}
+
+}
+//..................................................................................................
+
+//calculate the ratio of h2o/d2o
+string sheet3$="h2o/d2o";
+string sheet1$="d2o";
+string sheet2$="h2o";
+if(nd2o==1)
+{
+	sheet1$="d2o1";
+	sheet2$="h2o1";
+}
+page.active$=sheet3$;//h2o/d2o
+range waven=col(1);
+range temp=sheet1$!col(1);
+waven=temp;
+waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=samp$+"_h2o/d2o_ph$(ph)";
+for(ii=0;ii<nvol1;ii++)
+{
+	range d2o1=sheet1$!col($(ii+nvol1+4));
+	range h2o1=sheet2$!col($(ii+nvol1+4));
+	range d2o2=sheet1$!col($(ii+nvol1+2));
+	range h2o2=sheet2$!col($(ii+nvol1+2));
+	if(nd2o==1)
+		sntemp=1;
+	else
+		sntemp=2;
+	range dh=sheet3$!col($(ii+2));
+	dh=h2o$(sntemp)/d2o$(sntemp);
+	dh[l]$=h2o$(sntemp)[l]$;dh[c]$=smo_h2o/d2o_$(listvol1[ii],%2.1f)vto$(listvol1[ii+1],%2.1f)v_1min;
+	if(ii==0)
+	{
+		dh[c]$=smo_h2o/d2o_$(listvol1[ii+1],%2.1f)v_1min;
+	}
+}
+
