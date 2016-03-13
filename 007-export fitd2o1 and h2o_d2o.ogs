@@ -1,10 +1,10 @@
 ph=5.8;
-string date$="20160310";
-string tbook$="book7";
+string date$="20160313";
+string tbook$="book3";
 string name$="ph$(ph)_(-1.2_0.4).dat";
-string samp$=date$+"_si100d10(smooth)";
+string samp$=date$+"_si100e2(smooth)";
 //...............................................................................................
-string path$="D:\fudan\study\experiment\electrochemistry\origin data\export file\"+date$+"\ph$(ph)\";
+string path$="D:\百度云同步盘\Fudan study\experiment\origin data\export file\"+date$+"\ph$(ph)\";
 string sheetd2o$="fitd2o1";
 string sheetdh$="h2o/d2o";
 //............................................................................................

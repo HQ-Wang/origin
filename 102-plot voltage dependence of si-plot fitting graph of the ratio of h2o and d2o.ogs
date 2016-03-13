@@ -31,7 +31,7 @@ plotxy iy:=([workbook_now$]h2o/d2o!wcol(1),[workbook_now$]h2o/d2o!wcol(2+ndata+i
 layer.x.from=3000;
 layer.x.to=3900;
 layer.x.inc=200;
-layer.y.from=0;
+layer.y.from=-0.5;
 layer.y.to=3;
 layer.y.inc=1;
 //....................................................................................................;
