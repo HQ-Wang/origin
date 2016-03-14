@@ -1,0 +1,192 @@
+
+
+nmo=5;usenmo=5;//nmo means total numbers of modes in function.usenmo means numbers of useful modes.;
+//dataset listvol={0.4,0.2,0,-0.2,-0.4,-0.6,-0.8,-1,-1.2};
+dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
+nvol=listvol.getsize();
+nfit=1;
+stamo=2800;
+endmo=3700;
+intmo=100;
+ndata=1;//numbers of data used to do summation. modify every time;
+//...............................................................................................;
+//process the data based on the results of fitting. 
+//arrange the fitcurves and their seperately modes.
+//to get the X2_eff_h2o
+range waven=fith2o/d2o$(nfit)_eff!col(1);
+range temp=fitnlcurve$(nfit)!col(1);
+waven=temp;
+range temp=h2o/d2o!col(1);
+waven[l]$=temp[l]$;waven[u]$=temp[u]$;
+for(jj=0;jj<nvol;jj++)
+{
+	m=listvol[jj+1];
+	range fit=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+3));
+	range temp=fitnlcurve$(nfit)!col($(jj*4+2));
+	fit=temp;
+	fit[l]$=|X\+((2))\-(eff-si)+X\+((2))\-(eff-h2o)|\+(2)/|X\+((2))\-(eff-si)|\+(2);fit[c]$=fitcurve_$(m,.1)v;
+	if(m<0.01&&m>-0.01)
+	{
+		fit[c]$=fitcurve_0v;
+	}
+	range re_tot=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+4)); 
+	range im_tot=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+5));
+	re_tot=fit*0;
+	im_tot=fit*0;
+	re_tot[l]$=[X\+((2))\-(eff-h2o)];re_tot[u]$=10\+(-21)m\+(2)V\+(-1);re_tot[c]$="Re_total "+fit[c]$;
+	im_tot[l]$=[X\+((2))\-(eff-h2o)];im_tot[u]$=10\+(-21)m\+(2)V\+(-1);im_tot[c]$="Im_total "+fit[c]$;
+	for(ii=0;ii<usenmo;ii++)
+	{
+		a=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+3),8);
+		w=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+4),8);
+		t=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+5),8);
+		range x22_mo=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+ii+6));
+		range re_mo=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+ii+6+usenmo));
+		range im_mo=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+ii+6+usenmo*2));
+		x22_mo=(a*(waven-w)/((waven-w)^2+t^2))^2+(a*t/((waven-w)^2+t^2))^2;
+		re_mo=a*(waven-w)/((waven-w)^2+t^2);
+		re_tot+=re_mo;
+		im_mo=-a*t/((waven-w)^2+t^2);
+		im_tot+=im_mo;
+		x22_mo[l]$=|X\+((2))\-(eff-h2o)|\+(2);x22_mo[u]$=10\+(-42)m\+(4)V\+(-2);x22_mo[c]$=mode$(ii+1)($(w)cm\+(-1))_$(m,.1)v;
+		re_mo[l]$=[X\+((2))\-(eff-h2o)];re_mo[u]$=10\+(-21)m\+(2)V\+(-1);re_mo[c]$=Re_mode$(ii+1)($(w)cm\+(-1))_$(m,.1)v;
+		im_mo[l]$=[X\+((2))\-(eff-h2o)];im_mo[u]$=10\+(-21)m\+(2)V\+(-1);im_mo[c]$=Im_mode$(ii+1)($(w)cm\+(-1))_$(m,.1)v;
+	}
+	
+	
+}
+//.............................................................................................;
+//arrange the wavenumbers and area of modes vs voltages.;
+nmodes=$((endmo-stamo)/intmo+1);
+range vol=fith2o/d2o$(nfit)_eff!col($(2+(4+usenmo*3)*nvol));
+vol[l]$=voltage;vol[u]$=V;
+for(jj=0;jj<nmodes;jj++)//name the tags of wavenumbers, area of modes and amplitude
+{
+	range waven=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+jj));
+		waven[l]$=wavenumber;waven[u]$=cm\+(-1);waven[c]$=mode$(stamo+100*jj);
+	range area=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes+jj*2));
+		area[l]$=area of modes;area[u]$=10\+(-21)m\+(2)V\+(-1)cm\+(-1);area[c]$=mode($(stamo+100*jj));
+	range area_sd=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes+jj*2+1));
+		area_sd[l]$=sd_area of modes;area_sd[u]$=10\+(-21)m\+(2)V\+(-1)cm\+(-1);area_sd[c]$=mode($(stamo+100*jj));
+	range amp=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*3+jj*2));
+		amp[l]$=amlitude of modes;amp[u]$=fith2o/d2o$(nfit)_eff!col(4)[u]$;amp[c]$=mode($(stamo+100*jj));
+	range amp_sd=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*3+jj*2+1));
+		amp_sd[l]$=sd_amlitude of modes;amp_sd[u]$=fith2o/d2o$(nfit)_eff!col(4)[u]$;amp_sd[c]$=mode($(stamo+100*jj));
+	range width=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*5+jj));
+		width[l]$=width of modes;width[u]$=cm\+(-1);width[c]$=mode($(stamo+100*jj));
+}
+range area_tot=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*6));
+	area_tot[l]$=area_tot of modes;area_tot[u]$=10\+(-21)m\+(2)V\+(-1)cm\+(-1);area_tot[c]$="areas in total";
+range area_sd_tot=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*6+1));
+	area_sd_tot[l]$=sd_area_tot of modes;area_sd_tot[u]$=10\+(-21)m\+(2)V\+(-1)cm\+(-1);area_sd_tot[c]$="areas in total ";
+range amp_tot=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*6+2));
+	amp_tot[l]$=amlitude_tot of modes;amp_tot[u]$=fith2o/d2o$(nfit)_eff!col(4)[u]$;amp_tot[c]$="amplitude in total";
+range amp_sd_tot=fith2o/d2o$(nfit)_eff!col($(3+(4+usenmo*3)*nvol+nmodes*6+3));
+	amp_sd_tot[l]$=sd_amlitude of modes;amp_sd_tot[u]$=fith2o/d2o$(nfit)_eff!col(4)[u]$;amp_sd_tot[c]$="amplitude in total";
+
+for(ii=0;ii<nvol;ii++)//set the values of voltages as x-axis
+{
+	m=listvol[ii+1];
+	fith2o/d2o$(nfit)_eff!cell($(ii+1),$(2+(4+usenmo*3)*nvol))=m;
+	if(m<0.0001&&m>-0.0001)
+	{
+		fith2o/d2o$(nfit)_eff!cell($(ii+1),$(2+(4+usenmo*3)*nvol))=0;
+	}
+}
+for(ii=0;ii<nvol;ii++)//copy the values  of wavenumbers, area of modes from fitting results, and calculate the amplitudes of modes based on the area.
+{
+	for(kk=0;kk<nmodes;kk++)
+	{
+		for(jj=0;jj<6;jj++)
+		{
+			fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+jj*nmodes+kk))="";
+		}
+	}
+	a_tot=0;
+	a_sd_tot=0;
+	am_tot=0;
+	am_sd_tot=0;
+	for(jj=0;jj<usenmo;jj++)
+	{
+		a=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+3),8);
+		a_sd=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+3),9);
+		w=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+4),8);
+		t=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+5),8);
+		am=a/t;
+		am_sd=a_sd/t;
+		a_tot+=a;
+		a_sd_tot+=a_sd;
+		am_tot+=am;
+		am_sd_tot+=am_sd;
+		for(kk=0;kk<nmodes;kk++)
+		{
+			if(w>=stamo-50+100*kk&&w<stamo+50+100*kk)
+			{
+				fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+kk))=w;
+				fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+nmodes+kk*2))=a;
+				fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+nmodes+kk*2+1))=a_sd;
+				fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+3*nmodes+kk*2))=am;
+				fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+3*nmodes+kk*2+1))=am_sd;
+				fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+5*nmodes+kk))=t;
+			}
+		}
+		fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+6*nmodes))=a_tot;
+		fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+6*nmodes+1))=a_sd_tot;
+		fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+6*nmodes+2))=am_tot;
+		fith2o/d2o$(nfit)_eff!cell($(ii+1),$(3+(4+usenmo*3)*nvol+6*nmodes+3))=am_sd_tot;
+		
+	}
+}
+//....................................................................................................;
+//copy the error bars of curve_d2o/h2o to curve_fit_d2o/h2o;
+//calculate the error bars of Re_total fitcurve and Im_total fitcurve;
+range waven=fith2o/d2o$(nfit)_eff_sd!col(1);
+range temp=fitnlcurve$(nfit)!col(1);
+waven=temp;
+range temp=h2o/d2o!col(1);
+waven[l]$=temp[l]$;waven[u]$=temp[u]$;
+for(jj=0;jj<nvol;jj++)
+{
+	m=listvol[jj+1];
+	range fit=fith2o/d2o$(nfit)_eff_sd!col($(jj*7+3));
+	range temp=fitnlcurve$(nfit)!col($(jj*4+2));
+	range fit_sd= fith2o/d2o$(nfit)_eff_sd!col($(jj*7+4));
+	range temp_sd=h2o/d2o!col($(jj*(ndata+2)+ndata+3));
+	fit=temp;
+	interp1 ix:=fith2o/d2o$(nfit)_eff_sd!col(1) iy:=temp_sd ox:=fit_sd;
+	fit[l]$=|X\+((2))\-(eff-si)+X\+((2))\-(eff-h2o)|\+(2)/|X\+((2))\-(eff-si)|\+(2);fit[c]$=fitcurve_$(m,.1)v;
+	fit_sd[l]$=|X\+((2))\-(eff-si)+X\+((2))\-(eff-h2o)|\+(2)/|X\+((2))\-(eff-si)|\+(2); fit_sd[c]$=temp_sd[c]$;
+	if(m<0.01&&m>-0.01)
+	{
+		fit[c]$=fitcurve_0v;
+	}
+	range re_tot=fith2o/d2o$(nfit)_eff_sd!col($(jj*7+5)); 
+	range re_tot_sd= fith2o/d2o$(nfit)_eff_sd!col($(jj*7+6));
+	range im_tot=fith2o/d2o$(nfit)_eff_sd!col($(jj*7+7));
+	range im_tot_sd=fith2o/d2o$(nfit)_eff_sd!col($(jj*7+8));
+	re_tot=fit*0;
+	re_tot_sd=fit*0;
+	im_tot=fit*0;
+	im_tot_sd=fit*0;
+	re_tot[l]$=[X\+((2))\-(eff-h2o)];re_tot[u]$=10\+(-21)m\+(2)V\+(-1);re_tot[c]$="Re_total "+fit[c]$;
+	re_tot_sd[l]$=[X\+((2))\-(eff-h2o)];re_tot_sd[u]$=10\+(-21)m\+(2)V\+(-1);re_tot_sd[c]$="Re_total_sd "+fit[c]$;
+	im_tot[l]$=[X\+((2))\-(eff-h2o)];im_tot[u]$=10\+(-21)m\+(2)V\+(-1);im_tot[c]$="Im_total "+fit[c]$;
+	im_tot_sd[l]$=[X\+((2))\-(eff-h2o)];im_tot_sd[u]$=10\+(-21)m\+(2)V\+(-1);im_tot_sd[c]$="Im_total_sd "+fit[c]$;
+	for(ii=0;ii<usenmo;ii++)
+	{
+		a=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+3),8);
+		w=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+4),8);
+		t=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+5),8);
+		re_mo=a*(waven-w)/((waven-w)^2+t^2);
+		re_tot+=re_mo;
+		im_mo=-a*t/((waven-w)^2+t^2);
+		im_tot+=im_mo;
+		
+	}
+	ratio_c=fitnl$(nfit)!cell($(jj*(2+3*nmo)+1),8);
+	ratio_b=fitnl$(nfit)!cell($(jj*(2+3*nmo)+2),8);
+	re_tot_sd=abs(im_tot*fit_sd/2/fit);
+	im_tot_sd=abs(re_tot*fit_sd/2/fit);
+	
+}
+
