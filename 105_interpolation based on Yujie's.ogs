@@ -1,0 +1,132 @@
+
+//1. interpolation of x3_h2o(b) based on Yujie's data. 
+//2. Then calculate x2eff_h2o(b)=sin_ir*Fyy_sfg*Fyy_vis*Fzz_ir*x3_h2o(b)*E_dc;
+//3. then calculate x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
+
+string BOOK_IN_X$=book5;//*******************define the workbook where the vector to interpolate on;
+string SHEET_IN_X$=fith2o/d2o1_eff_sd;//*********************select the sheet where The vector to interpolate on;
+string BOOK_IN_Y$=book4;//*****************define the workbook where the Y values you want to be used for interpolation exist;
+string SHEET_IN_Y$=1;//********************select the sheet where the Y values you want to be used for interpolation exist;
+string BOOK_OUT$=book10;//*******************define the workbook where you want to put the results of interpolation;
+string SHEET_OUT$=X3&X2eff_h2o_bulk_interp_Yujie's;//********************define the name of sheet where you want to put the results of interpolation;
+string SHEET_X2EFF$=X2eff_h2o;//******************define the name of sheet of fitting results of x2_eff_h2o delivered from BOOK_IN$;
+string SHEET_X2EFF_S$=X2eff_h2o_surface;//********************define the name of sheet of calculation results of x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
+
+R_h2o=3.2e-2;//PH6.4=5.4e5,PH5.8=6.4e4,PH1.5=3.2e-2,PH11.5=1.65;
+R_total=1+R_h2o;
+ratio_R=R_h2o/R_total;
+
+length_debye=1.2;//nm;//PH6.4=340.8NM,PH5.8=170.8NM,PH1.5=1.2NM,PH11.5=3.8NM;
+length_coherent=57.1;//nm;coherent length in water
+
+//dataset LIST_VOL={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//V @ ph5.8&11.5;//the order must be careful!;
+dataset LIST_VOL={-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8};//v@ph1.5;//the order must be careful!;
+U_min=[BOOK_IN_X$]fitd2o!cell(4,7);//search the min voltage @ the ph system used;
+
+angle_IR_air=60;
+Fyy_sfg=0.33;
+Fyy_vis=0.36;
+Fzz_ir=0.43;
+
+NUM_MODE=5;//only used in part2 to the fitting results of x2_eff_h2o from BOOK_IN$ ;
+//*********************************************************************************************
+dataset constant=(LIST_VOL-U_min)*ratio_R/(1+(length_debye/length_coherent)^2)*sin(pi*angle_IR_air/180)*Fyy_sfg*Fyy_vis*Fzz_ir;
+dataset LIST_RE_C=constant;// V initialize
+dataset LIST_IM_C=constant*(-length_debye/length_coherent);// V initialize
+NUM_LIST=LIST_VOL.getsize();
+
+//**************************************************************************************************************************;
+//output the interpolation results of X3_h2o_bulk based on Yujie's data
+range WAVEN=[BOOK_OUT$]SHEET_OUT$!col(1);
+range IN_X=[BOOK_IN_X$]SHEET_IN_X$!col(1);
+WAVEN=IN_X;
+WAVEN[l]$=IN_X[l]$;WAVEN[u]$=IN_X[u]$;WAVEN[c]$=IN_X[c]$;
+
+for(i=0;i<2;i++)
+{
+	range IN_Y=[BOOK_IN_Y$]SHEET_IN_Y$!wcol(3+i*3);//dependent with cases
+	range OUT_Y=[BOOK_OUT$]SHEET_OUT$!wcol(2+i);//dependent with cases
+	interp1 ix:=IN_X iy:=IN_Y ox:=OUT_Y;
+	OUT_Y=OUT_Y*10^21;
+	OUT_Y[l]$=IN_Y[l]$;OUT_Y[u]$=10\+(-21)m\+(2)V\+(-2);OUT_Y[c]$=IN_Y[c]$;
+}
+//calculate the X2_eff_h2o_bulk based on the X3_h2o_bulk above & coefficients LIST_RE_C+i*LIST_RE_C
+range RE_X3=[BOOK_OUT$]SHEET_OUT$!col(2);//dependent with cases
+range IM_X3=[BOOK_OUT$]SHEET_OUT$!col(3);//dependent with cases
+
+for(i=0;i<NUM_LIST;i++)
+{
+	range RE_X2_EFF_B=[BOOK_OUT$]SHEET_OUT$!wcol(5+i*4);//dependent with cases;
+	range RE_X2_EFF_B_SD=[BOOK_OUT$]SHEET_OUT$!wcol(6+i*4);
+	range IM_X2_EFF_B=[BOOK_OUT$]SHEET_OUT$!wcol(7+i*4);//dependent with cases;
+	range IM_X2_EFF_B_SD=[BOOK_OUT$]SHEET_OUT$!wcol(8+i*4);
+	RE_X2_EFF_B=(LIST_RE_C[1+i]*RE_X3-LIST_IM_C[1+i]*IM_X3);
+	RE_X2_EFF_B_SD=RE_X2_EFF_B*0;
+	IM_X2_EFF_B=(LIST_RE_C[1+i]*IM_X3+LIST_IM_C[1+i]*RE_X3);
+	IM_X2_EFF_B_SD=IM_X2_EFF_B*0;
+	RE_X2_EFF_B[l]$=X\=(eff_H\-(2)O(B),(2))(ssp);RE_X2_EFF_B[u]$=10\+(-21)m\+(2)V\+(-1);RE_X2_EFF_B[c]$=Re_bulk $(LIST_VOL[1+i])V;
+	RE_X2_EFF_B_SD[l]$=X\=(eff_H\-(2)O(B),(2))(ssp);RE_X2_EFF_B_SD[u]$=10\+(-21)m\+(2)V\+(-1);RE_X2_EFF_B_SD[c]$=Re_bulk_SD $(LIST_VOL[1+i])V;
+	IM_X2_EFF_B[l]$=X\=(eff_H\-(2)O(B),(2))(ssp);IM_X2_EFF_B[u]$=10\+(-21)m\+(2)V\+(-1);IM_X2_EFF_B[c]$=IM_bulk $(LIST_VOL[1+i])V;
+	IM_X2_EFF_B_SD[l]$=X\=(eff_H\-(2)O(B),(2))(ssp);IM_X2_EFF_B_SD[u]$=10\+(-21)m\+(2)V\+(-1);IM_X2_EFF_B_SD[c]$=IM_bulk_SD $(LIST_VOL[1+i])V;
+}
+//****************************************************************************************************************************;
+//deliver the fitting results of x2_eff_h2o from BOOK_IN$;
+//here we default the voltage order in original sheet is from large to small. if not, we need to modify this program.
+range WAVEN=[BOOK_OUT$]SHEET_X2EFF$!col(1);
+range IN_X=[BOOK_IN_X$]SHEET_IN_X$!col(1);
+WAVEN=IN_X;
+WAVEN[l]$=IN_X[l]$;WAVEN[u]$=IN_X[u]$;WAVEN[c]$=IN_X[c]$;
+for(i=0;i<NUM_LIST;i++)
+{
+	range RE_X2_EFF_TOT_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(5+7*(NUM_LIST-1-i));//dependent with cases;
+	range RE_X2_EFF_TOT_SD_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(6+7*(NUM_LIST-1-i));
+	range IM_X2_EFF_TOT_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(7+7*(NUM_LIST-1-i));//dependent with cases;
+	range IM_X2_EFF_TOT_SD_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(8+7*(NUM_LIST-1-i));
+	range RE_X2_EFF_TOT=[BOOK_OUT$]SHEET_X2EFF$!wcol(5+i*4);//dependent with cases;
+	range RE_X2_EFF_TOT_SD=[BOOK_OUT$]SHEET_X2EFF$!wcol(6+i*4);
+	range IM_X2_EFF_TOT=[BOOK_OUT$]SHEET_X2EFF$!wcol(7+i*4);//dependent with cases;
+	range IM_X2_EFF_TOT_SD=[BOOK_OUT$]SHEET_X2EFF$!wcol(8+i*4);
+	RE_X2_EFF_TOT=RE_X2_EFF_TOT_ORI;
+	RE_X2_EFF_TOT_SD=RE_X2_EFF_TOT_SD_ORI;
+	IM_X2_EFF_TOT=IM_X2_EFF_TOT_ORI;
+	IM_X2_EFF_TOT_SD=IM_X2_EFF_TOT_SD_ORI;
+	RE_X2_EFF_TOT[l]$=RE_X2_EFF_TOT_ORI[l]$;RE_X2_EFF_TOT[u]$=RE_X2_EFF_TOT_ORI[u]$;RE_X2_EFF_TOT[c]$=RE_X2_EFF_TOT_ORI[c]$;
+	RE_X2_EFF_TOT_SD[l]$=RE_X2_EFF_TOT_SD_ORI[l]$;RE_X2_EFF_TOT_SD[u]$=RE_X2_EFF_TOT_SD_ORI[u]$;RE_X2_EFF_TOT_SD[c]$=RE_X2_EFF_TOT_SD_ORI[c]$;
+	IM_X2_EFF_TOT[l]$=IM_X2_EFF_TOT_ORI[l]$;IM_X2_EFF_TOT[u]$=IM_X2_EFF_TOT_ORI[u]$;IM_X2_EFF_TOT[c]$=IM_X2_EFF_TOT_ORI[c]$;
+	IM_X2_EFF_TOT_SD[l]$=IM_X2_EFF_TOT_SD_ORI[l]$;IM_X2_EFF_TOT_SD[u]$=IM_X2_EFF_TOT_SD_ORI[u]$;IM_X2_EFF_TOT_SD[c]$=IM_X2_EFF_TOT_SD_ORI[c]$;
+}
+//****************************************************************************************************************************;
+//calculate x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
+range WAVEN=[BOOK_OUT$]SHEET_X2EFF_S$!col(1);
+range IN_X=[BOOK_IN_X$]SHEET_IN_X$!col(1);
+WAVEN=IN_X;
+WAVEN[l]$=IN_X[l]$;WAVEN[u]$=IN_X[u]$;WAVEN[c]$=IN_X[c]$;
+for(i=0;i<NUM_LIST;i++)
+{
+	range RE_X2_EFF_B=[BOOK_OUT$]SHEET_OUT$!wcol(5+i*4);//dependent with cases;
+	range RE_X2_EFF_B_SD=[BOOK_OUT$]SHEET_OUT$!wcol(6+i*4);//dependent with cases;
+	range IM_X2_EFF_B=[BOOK_OUT$]SHEET_OUT$!wcol(7+i*4);//dependent with cases;
+	range IM_X2_EFF_B_SD =[BOOK_OUT$]SHEET_OUT$!wcol(8+i*4);//dependent with cases;
+	range RE_X2_EFF_TOT=[BOOK_OUT$]SHEET_X2EFF$!wcol(5+i*4);//dependent with cases;
+	range RE_X2_EFF_TOT_SD=[BOOK_OUT$]SHEET_X2EFF$!wcol(6+i*4);//dependent with cases;
+	range IM_X2_EFF_TOT=[BOOK_OUT$]SHEET_X2EFF$!wcol(7+i*4);//dependent with cases;
+	range IM_X2_EFF_TOT_SD=[BOOK_OUT$]SHEET_X2EFF$!wcol(8+i*4);//dependent with cases;
+	range RE_X2_EFF_S=[BOOK_OUT$]SHEET_X2EFF_S$!wcol(5+i*4);//dependent with cases;
+	range RE_X2_EFF_S_SD=[BOOK_OUT$]SHEET_X2EFF_S$!wcol(6+i*4);//dependent with cases;
+	range IM_X2_EFF_S=[BOOK_OUT$]SHEET_X2EFF_S$!wcol(7+i*4);//dependent with cases;
+	range IM_X2_EFF_S_SD =[BOOK_OUT$]SHEET_X2EFF_S$!wcol(8+i*4);//dependent with cases;
+
+	RE_X2_EFF_S=RE_X2_EFF_TOT-RE_X2_EFF_B;
+	RE_X2_EFF_S_SD=(RE_X2_EFF_TOT_SD^2+RE_X2_EFF_B_SD^2)^0.5;
+	IM_X2_EFF_S=IM_X2_EFF_TOT-IM_X2_EFF_B;
+	IM_X2_EFF_S_SD=(IM_X2_EFF_TOT_SD^2+IM_X2_EFF_B_SD^2)^0.5;
+	RE_X2_EFF_S[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);RE_X2_EFF_S[u]$=RE_X2_EFF_B[u]$;RE_X2_EFF_S[c]$=Re_S $(LIST_VOL[1+i])V;
+	RE_X2_EFF_S_SD[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);RE_X2_EFF_S_SD[u]$=RE_X2_EFF_B_SD[u]$;RE_X2_EFF_S_SD[c]$=Re_S_SD $(LIST_VOL[1+i])V;
+	IM_X2_EFF_S[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S[u]$=IM_X2_EFF_B[u]$;IM_X2_EFF_S[c]$=Im_S $(LIST_VOL[1+i])V;
+	IM_X2_EFF_S_SD[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S_SD[u]$=IM_X2_EFF_B_SD[u]$;IM_X2_EFF_S_SD[c]$=IM_S_SD $(LIST_VOL[1+i])V;
+}
+	
+
+	
+
+
