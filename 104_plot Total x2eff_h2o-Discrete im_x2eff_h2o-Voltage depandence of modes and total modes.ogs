@@ -262,7 +262,7 @@ layer.y.from=-0.6;
 layer.y.to=1.5;
 layer.y.inc=0.5;
 //....................................................................................................
-newpanel 1 1 name:="7_im_x2eff_surface PH$(ph)";
+newpanel 1 1 name:="7_im_x2eff_h2o PH$(ph)";
 
 for (ii=0; ii<nvol; ii++)
 {
