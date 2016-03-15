@@ -3,24 +3,24 @@
 //2. Then calculate x2eff_h2o(b)=sin_ir*Fyy_sfg*Fyy_vis*Fzz_ir*x3_h2o(b)*E_dc;
 //3. then calculate x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
 
-string BOOK_IN_X$=book5;//*******************define the workbook where the vector to interpolate on;
+string BOOK_IN_X$=book1;//*******************define the workbook where the vector to interpolate on;
 string SHEET_IN_X$=fith2o/d2o1_eff_sd;//*********************select the sheet where The vector to interpolate on;
-string BOOK_IN_Y$=book4;//*****************define the workbook where the Y values you want to be used for interpolation exist;
+string BOOK_IN_Y$=book2;//*****************define the workbook where the Y values you want to be used for interpolation exist;
 string SHEET_IN_Y$=1;//********************select the sheet where the Y values you want to be used for interpolation exist;
-string BOOK_OUT$=book10;//*******************define the workbook where you want to put the results of interpolation;
+string BOOK_OUT$=book2;//*******************define the workbook where you want to put the results of interpolation;
 string SHEET_OUT$=X3&X2eff_h2o_bulk_interp_Yujie's;//********************define the name of sheet where you want to put the results of interpolation;
 string SHEET_X2EFF$=X2eff_h2o;//******************define the name of sheet of fitting results of x2_eff_h2o delivered from BOOK_IN$;
 string SHEET_X2EFF_S$=X2eff_h2o_surface;//********************define the name of sheet of calculation results of x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
 
-R_h2o=3.2e-2;//PH6.4=5.4e5,PH5.8=6.4e4,PH1.5=3.2e-2,PH11.5=1.65;
+R_h2o=6.4e4;//PH6.4=5.4e5,PH5.8=6.4e4,PH1.5=3.2e-2,PH11.5=1.65;
 R_total=1+R_h2o;
 ratio_R=R_h2o/R_total;
 
-length_debye=1.2;//nm;//PH6.4=340.8NM,PH5.8=170.8NM,PH1.5=1.2NM,PH11.5=3.8NM;
+length_debye=241.5;//nm;//PH6.4=481.8NM,PH5.8=241.5NM,PH1.5=1.7NM,PH11.5=5.4NM;
 length_coherent=57.1;//nm;coherent length in water
 
-//dataset LIST_VOL={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//V @ ph5.8&11.5;//the order must be careful!;
-dataset LIST_VOL={-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8};//v@ph1.5;//the order must be careful!;
+dataset LIST_VOL={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//V @ ph5.8&11.5;//the order must be careful!;
+//dataset LIST_VOL={-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8};//v@ph1.5;//the order must be careful!;
 U_min=[BOOK_IN_X$]fitd2o!cell(4,7);//search the min voltage @ the ph system used;
 
 angle_IR_air=60;
@@ -44,7 +44,7 @@ WAVEN[l]$=IN_X[l]$;WAVEN[u]$=IN_X[u]$;WAVEN[c]$=IN_X[c]$;
 
 for(i=0;i<2;i++)
 {
-	range IN_Y=[BOOK_IN_Y$]SHEET_IN_Y$!wcol(3+i*3);//dependent with cases
+	range IN_Y=[BOOK_IN_Y$]SHEET_IN_Y$!wcol(2+i);//dependent with cases
 	range OUT_Y=[BOOK_OUT$]SHEET_OUT$!wcol(2+i);//dependent with cases
 	interp1 ix:=IN_X iy:=IN_Y ox:=OUT_Y;
 	OUT_Y=OUT_Y*10^21;
@@ -130,3 +130,4 @@ for(i=0;i<NUM_LIST;i++)
 	
 
 
+#Command Error!
