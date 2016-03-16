@@ -12,24 +12,35 @@ string SHEET_OUT$=X3&X2eff_h2o_bulk_interp_Yujie's;//********************define 
 string SHEET_X2EFF$=X2eff_h2o;//******************define the name of sheet of fitting results of x2_eff_h2o delivered from BOOK_IN$;
 string SHEET_X2EFF_S$=X2eff_h2o_surface;//********************define the name of sheet of calculation results of x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
 
-R_h2o=6.4e4;//PH6.4=5.4e5,PH5.8=6.4e4,PH1.5=3.2e-2,PH11.5=1.65;
-R_total=1+R_h2o;
+ph=5.8;//
+R_h2o=15;//resistance of water in cell experimentally (Mohm);
+R_si=2;//resistance of silicon wafer experimentally (Mohm)
+R_total=R_si+R_h2o;
 ratio_R=R_h2o/R_total;
-
-length_debye=241.5;//nm;//PH6.4=481.8NM,PH5.8=241.5NM,PH1.5=1.7NM,PH11.5=5.4NM;
-length_coherent=57.1;//nm;coherent length in water
 
 dataset LIST_VOL={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//V @ ph5.8&11.5;//the order must be careful!;
 //dataset LIST_VOL={-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8};//v@ph1.5;//the order must be careful!;
-U_min=[BOOK_IN_X$]fitd2o!cell(4,7);//search the min voltage @ the ph system used;
+ndata=1;//numbers of data used in the calculation at fitd2o sheet
+U_min=[BOOK_IN_X$]fitd2o!cell(4,$(5+ndata));//search the min voltage @ the ph system used;
 
+length_coherent=57.1;//nm;coherent length in water
 angle_IR_air=60;
 Fyy_sfg=0.33;
 Fyy_vis=0.36;
 Fzz_ir=0.43;
 
 NUM_MODE=5;//only used in part2 to the fitting results of x2_eff_h2o from BOOK_IN$ ;
-//*********************************************************************************************
+//*********************************************************************************************;
+//calculate debye length(nm);
+if(ph>7)
+    PH=14-ph;
+else
+    PH=ph;
+c1=10^-PH;
+c2=10^-PH;
+i=0.5*(c1+c2);
+length_debye=3.04*10^-1/i^0.5;//nm;
+//****************************************************************************************************
 dataset constant=(LIST_VOL-U_min)*ratio_R/(1+(length_debye/length_coherent)^2)*sin(pi*angle_IR_air/180)*Fyy_sfg*Fyy_vis*Fzz_ir;
 dataset LIST_RE_C=constant;// V initialize
 dataset LIST_IM_C=constant*(-length_debye/length_coherent);// V initialize
@@ -78,9 +89,9 @@ WAVEN=IN_X;
 WAVEN[l]$=IN_X[l]$;WAVEN[u]$=IN_X[u]$;WAVEN[c]$=IN_X[c]$;
 for(i=0;i<NUM_LIST;i++)
 {
-	range RE_X2_EFF_TOT_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(5+7*(NUM_LIST-1-i));//dependent with cases;
+	range RE_X2_EFF_TOT_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(5+7*i);//dependent with cases: forwards: 7*i or backwards:7*(NUM_LIST-1-i) ;
 	range RE_X2_EFF_TOT_SD_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(6+7*(NUM_LIST-1-i));
-	range IM_X2_EFF_TOT_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(7+7*(NUM_LIST-1-i));//dependent with cases;
+	range IM_X2_EFF_TOT_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(7+7*i);//dependent with cases: forwards: 7*i or backwards:7*(NUM_LIST-1-i) ;
 	range IM_X2_EFF_TOT_SD_ORI=[BOOK_IN_X$]SHEET_IN_X$!wcol(8+7*(NUM_LIST-1-i));
 	range RE_X2_EFF_TOT=[BOOK_OUT$]SHEET_X2EFF$!wcol(5+i*4);//dependent with cases;
 	range RE_X2_EFF_TOT_SD=[BOOK_OUT$]SHEET_X2EFF$!wcol(6+i*4);
@@ -125,9 +136,4 @@ for(i=0;i<NUM_LIST;i++)
 	IM_X2_EFF_S[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S[u]$=IM_X2_EFF_B[u]$;IM_X2_EFF_S[c]$=Im_S $(LIST_VOL[1+i])V;
 	IM_X2_EFF_S_SD[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S_SD[u]$=IM_X2_EFF_B_SD[u]$;IM_X2_EFF_S_SD[c]$=IM_S_SD $(LIST_VOL[1+i])V;
 }
-	
-
-	
-
-
 #Command Error!

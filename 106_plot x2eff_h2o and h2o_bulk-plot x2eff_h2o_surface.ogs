@@ -1,0 +1,120 @@
+//parameters setting.modify every time.
+string workbook_now$="book2";//fitdata workbook.
+dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
+//dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};//here the order is useless. the list is only used once for count;
+nvol=listvol.getsize();
+ph=5.8;//set pH value.
+
+sheet_x2_eff_bulk$="X3&X2eff_h2o_bulk_interp_Yujie's";
+sheet_x2_eff_total$="X2eff_h2o";
+sheet_x2_eff_surface$="X2eff_h2o_surface";
+//.............................................................................................
+newpanel 3 3 name:="1 x2_eff_h2o_total &h2o_bulk PH$(ph)";//plot the curves of total x2eff_h2o and x2eff_h2o_bulk.
+layarrange row:=3 col:=3 xgap:=4 ygap:=4 left:=7 right:=7 top:=7 bottom:=7;
+
+for (ii=0; ii<nvol; ii++)
+{
+	plotxy iy:=([workbook_now$]sheet_x2_eff_total$!wcol(1),[workbook_now$]sheet_x2_eff_total$!wcol(5+ii*4),[workbook_now$]sheet_x2_eff_total$!wcol(6+ii*4)) plot:=202 size:=9 color:=1 ogl:=$(ii+1);
+	plotxy iy:=([workbook_now$]sheet_x2_eff_total$!wcol(1),[workbook_now$]sheet_x2_eff_total$!wcol(7+ii*4),[workbook_now$]sheet_x2_eff_total$!wcol(8+ii*4)) plot:=202 size:=9 color:=2 ogl:=$(ii+1);
+	plotxy iy:=([workbook_now$]sheet_x2_eff_bulk$!wcol(1),[workbook_now$]sheet_x2_eff_bulk$!wcol(5+ii*4),[workbook_now$]sheet_x2_eff_bulk$!wcol(6+ii*4)) plot:=202 size:=3 color:=1 ogl:=$(ii+1);
+	plotxy iy:=([workbook_now$]sheet_x2_eff_bulk$!wcol(1),[workbook_now$]sheet_x2_eff_bulk$!wcol(7+ii*4),[workbook_now$]sheet_x2_eff_bulk$!wcol(8+ii*4)) plot:=202 size:=3 color:=2 ogl:=$(ii+1);
+}
+
+
+loop(ii,1,nvol)
+{
+	page.active=$(ii);
+	legend.fsize=28;
+	legend.y = layer.y.to - legend.dy*20 / 100;
+	legend.x = layer.x.from + legend.dx *120/ 100;
+}
+
+laylink  igl:=1 destlayers:=2:9 XAxis:=1 unit:=link;
+laylink  igl:=1 destlayers:=2:3 YAxis:=1 unit:=link;
+laylink  igl:=4 destlayers:=5:6 YAxis:=1 unit:=link;
+laylink  igl:=7 destlayers:=8:9 YAxis:=1 unit:=link;
+
+page.active=1;
+layer.x.from=3000;
+layer.x.to=3800;
+layer.x.inc=200;
+layer.y.from=-1.2;
+layer.y.to=1.2;
+layer.y.inc=0.5;
+
+page.active=4;
+layer.y.from=-1.2;
+layer.y.to=1.2;
+layer.y.inc=0.5;
+
+page.active=7;
+layer.y.from=-1.2;
+layer.y.to=1.2;
+layer.y.inc=0.5;
+
+//..........................................................................................;
+newpanel 3 3 name:="2_total x2_eff_h2o_surface PH$(ph)";//plot the curves of total x2eff_h2o_surface.
+layarrange row:=3 col:=3 xgap:=4 ygap:=4 left:=7 right:=7 top:=7 bottom:=7;
+
+for (ii=0; ii<nvol; ii++)
+{
+	plotxy iy:=([workbook_now$]sheet_x2_eff_surface$!wcol(1),[workbook_now$]sheet_x2_eff_surface$!wcol(5+ii*4),[workbook_now$]sheet_x2_eff_surface$!wcol(6+ii*4)) plot:=202 size:=3 color:=1 ogl:=$(ii+1);
+	plotxy iy:=([workbook_now$]sheet_x2_eff_surface$!wcol(1),[workbook_now$]sheet_x2_eff_surface$!wcol(7+ii*4),[workbook_now$]sheet_x2_eff_surface$!wcol(8+ii*4)) plot:=202 size:=3 color:=2 ogl:=$(ii+1);
+}
+
+loop(ii,1,nvol)
+{
+	page.active=$(ii);
+	legend.fsize=28;
+	legend.y = layer.y.to - legend.dy*20 / 100;
+	legend.x = layer.x.from + legend.dx *60/ 100;
+}
+
+laylink  igl:=1 destlayers:=2:9 XAxis:=1 YAxis:=1 unit:=link;
+//laylink  igl:=1 destlayers:=2:3 YAxis:=1 unit:=link;
+//laylink  igl:=4 destlayers:=5:6 YAxis:=1 unit:=link;
+//laylink  igl:=7 destlayers:=8:9 YAxis:=1 unit:=link;
+
+page.active=1;
+layer.x.from=2800;
+layer.x.to=3800;
+layer.x.inc=200;
+layer.y.from=-1.2;
+layer.y.to=1;
+layer.y.inc=0.5;
+
+//page.active=4;
+//layer.y.from=-1.2;
+//layer.y.to=1.2;
+//layer.y.inc=0.5;
+
+//page.active=7;
+//layer.y.from=-1.2;
+//layer.y.to=1.2;
+//layer.y.inc=0.5;
+//..........................................................................................
+
+newpanel 1 1 name:="3_im_x2eff_h2o_surface PH$(ph)";
+
+for (ii=0; ii<nvol; ii++)
+{
+	plotxy iy:=([workbook_now$]sheet_x2_eff_surface$!wcol(1),[workbook_now$]sheet_x2_eff_surface$!wcol(7+ii*4),[workbook_now$]sheet_x2_eff_surface$!wcol(8+ii*4)) plot:=202 size:=5 color:=$(ii+1) ogl:=1;
+}
+
+legend.fsize=18;
+legend.y = layer.y.to - legend.dy*1 /100;
+legend.x = layer.x.from + legend.dx *50/ 100;
+
+layer.x.from=2800;
+layer.x.to=3750;
+layer.x.inc=200;
+
+page.active=1;
+layer.y.from=-1.5;
+layer.y.to=0.5;
+layer.y.inc=0.5;
+
+//....................................................................................................
+
+#Command Error!
+#Command Error!
