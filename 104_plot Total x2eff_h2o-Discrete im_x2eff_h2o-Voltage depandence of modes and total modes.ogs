@@ -1,5 +1,5 @@
 //parameters setting.modify every time.
-string workbook_now$="book1";//fitdata workbook.
+string workbook_now$="book3";//fitdata workbook.
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
 ph=5.8;//set pH value.
@@ -278,7 +278,7 @@ layer.x.to=3800;
 layer.x.inc=200;
 
 page.active=1;
-layer.y.from=-1.0;
+layer.y.from=-1.3;
 layer.y.to=1.2;
 layer.y.inc=0.5;
 

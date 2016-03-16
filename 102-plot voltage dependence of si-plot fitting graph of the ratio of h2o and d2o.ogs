@@ -1,10 +1,10 @@
 
-string workbook_now$="book1";//modify every time.fitdata workbook.
+string workbook_now$="book3";//modify every time.fitdata workbook.
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
 ph=5.8;//set pH value.modify every time.;
-string samp$="si100d(smooth)";//set your sample.modify every time.;
+string samp$="si100d(scratched)";//set your sample.modify every time.;
 int ndata=1;
 
 //............................................................................................;

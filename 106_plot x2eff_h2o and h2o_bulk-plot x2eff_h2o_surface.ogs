@@ -1,5 +1,5 @@
 //parameters setting.modify every time.
-string workbook_now$="book2";//fitdata workbook.
+string workbook_now$="book4";//fitdata workbook.
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};//here the order is useless. the list is only used once for count;
 nvol=listvol.getsize();

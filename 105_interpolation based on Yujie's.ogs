@@ -3,25 +3,26 @@
 //2. Then calculate x2eff_h2o(b)=sin_ir*Fyy_sfg*Fyy_vis*Fzz_ir*x3_h2o(b)*E_dc;
 //3. then calculate x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
 
-string BOOK_IN_X$=book1;//*******************define the workbook where the vector to interpolate on;
+string BOOK_IN_X$=book3;//*******************define the workbook where the vector to interpolate on;
 string SHEET_IN_X$=fith2o/d2o1_eff_sd;//*********************select the sheet where The vector to interpolate on;
-string BOOK_IN_Y$=book2;//*****************define the workbook where the Y values you want to be used for interpolation exist;
+string BOOK_IN_Y$=book4;//*****************define the workbook where the Y values you want to be used for interpolation exist;
 string SHEET_IN_Y$=1;//********************select the sheet where the Y values you want to be used for interpolation exist;
-string BOOK_OUT$=book2;//*******************define the workbook where you want to put the results of interpolation;
+string BOOK_OUT$=book4;//*******************define the workbook where you want to put the results of interpolation;
 string SHEET_OUT$=X3&X2eff_h2o_bulk_interp_Yujie's;//********************define the name of sheet where you want to put the results of interpolation;
 string SHEET_X2EFF$=X2eff_h2o;//******************define the name of sheet of fitting results of x2_eff_h2o delivered from BOOK_IN$;
 string SHEET_X2EFF_S$=X2eff_h2o_surface;//********************define the name of sheet of calculation results of x2_eff_h2o_surface=x2_eff_h2o-x2_eff_h2o_bulk(Yujie's)
 
 ph=5.8;//
 R_h2o=15;//resistance of water in cell experimentally (Mohm);
-R_si=2;//resistance of silicon wafer experimentally (Mohm)
+R_si=0.5;//resistance of silicon wafer experimentally (Mohm)
 R_total=R_si+R_h2o;
 ratio_R=R_h2o/R_total;
 
 dataset LIST_VOL={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//V @ ph5.8&11.5;//the order must be careful!;
 //dataset LIST_VOL={-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8};//v@ph1.5;//the order must be careful!;
-ndata=1;//numbers of data used in the calculation at fitd2o sheet
-U_min=[BOOK_IN_X$]fitd2o!cell(4,$(5+ndata));//search the min voltage @ the ph system used;
+//ndata=1;//numbers of data used in the calculation at fitd2o sheet
+//U_min=[BOOK_IN_X$]fitd2o!cell(4,$(5+ndata));//search the min voltage @ the ph system used;
+U_min=-0.4;
 
 length_coherent=57.1;//nm;coherent length in water
 angle_IR_air=60;
@@ -136,4 +137,4 @@ for(i=0;i<NUM_LIST;i++)
 	IM_X2_EFF_S[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S[u]$=IM_X2_EFF_B[u]$;IM_X2_EFF_S[c]$=Im_S $(LIST_VOL[1+i])V;
 	IM_X2_EFF_S_SD[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S_SD[u]$=IM_X2_EFF_B_SD[u]$;IM_X2_EFF_S_SD[c]$=IM_S_SD $(LIST_VOL[1+i])V;
 }
-#Command Error!
+

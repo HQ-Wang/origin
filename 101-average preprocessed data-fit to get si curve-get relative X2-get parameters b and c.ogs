@@ -5,16 +5,16 @@
 
 
 //********************************************************************************
-range workbooknow=[book1];//modify every time;
+range workbooknow=[book3];//modify every time;
 int ndata=1;//numbers of data used to do summation. modify every time;
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
 ph=5.8;//set pH value.modify every time.;
-string samp1$="20160114si100d10(smooth)";//set the serial number of your sample.modify every time.;
+string samp1$="20160114si100d10(scratched)";//set the serial number of your sample.modify every time.;
 string samp2$="20140908si100e2(smooth)";//set the serial number of your sample.modify every time.;
 string samp3$="20141006si100d3ots";
-workbooknow.longname$="new_mean_ph$(ph)_si100d(smooth)";//modify every time;
+workbooknow.longname$="new_mean_ph$(ph)_si100d(scratched)";//modify every time;
 string sheeta$="fitd2o";
 string sheetb$="h2o/d2o";
 nonwn=3750;//wavenumber at nonresident range.;
