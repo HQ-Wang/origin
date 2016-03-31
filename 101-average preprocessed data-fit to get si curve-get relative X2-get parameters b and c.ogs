@@ -5,16 +5,16 @@
 
 
 //********************************************************************************
-range workbooknow=[book3];//modify every time;
+range workbooknow=[book5];//modify every time;
 int ndata=1;//numbers of data used to do summation. modify every time;
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
 ph=5.8;//set pH value.modify every time.;
-string samp1$="20160114si100d10(scratched)";//set the serial number of your sample.modify every time.;
-string samp2$="20140908si100e2(smooth)";//set the serial number of your sample.modify every time.;
+string samp1$="20160114si100d10(smooth)";//set the serial number of your sample.modify every time.;
+string samp2$="20140908si100d4";//set the serial number of your sample.modify every time.;
 string samp3$="20141006si100d3ots";
-workbooknow.longname$="new_mean_ph$(ph)_si100d(scratched)";//modify every time;
+workbooknow.longname$="new_mean_ph$(ph)_si100d";//modify every time;
 string sheeta$="fitd2o";
 string sheetb$="h2o/d2o";
 nonwn=3750;//wavenumber at nonresident range.;
@@ -23,6 +23,7 @@ nonwn=3750;//wavenumber at nonresident range.;
 //this part below only can be uesd once, which is uesd to create new sheets.;
 newsheet name:=sheeta$;
 newsheet name:=sheetb$;
+newsheet name:="nor_"+sheetb$;
 //...................................................................................................
 for(i=0;i<ndata;i++)
 {
@@ -151,4 +152,22 @@ for(ii=0;ii<nvol;ii++)
 	non[$(ii+1)]=$(ddd^0.5);//thevalue of "c" in the nonlinear fitting about water features.
 }
 //..........................................................................
+//correct the fluctuation of energy ;
+//re-calculate the mean and SE of the datas of "h2o/d2o".
+range waven=$(ndata*2+3)!wcol(1);
+range temp=$(ndata*2+2)!wcol(1);
+waven=temp;
+waven[l]$=temp[l]$;waven[u]$=temp[u]$;
+range para_c=$(ndata*2+1)!wcol(ndata*2+8);
+for(ii=0;ii<nvol;ii++)
+{	
+	range mean=$(ndata*2+3)!wcol(2+ii*(ndata+2)+ndata);
+	range temp=$(ndata*2+2)!wcol(2+ii*(ndata+2)+ndata);
+	mean[l]$=temp[l]$;mean[c]$="nor_"+temp[c]$;
+	mean=temp/(para_c[$(ii+1)])^2;
+	range sd=$(ndata*2+3)!wcol(3+ii*(ndata+2)+ndata);
+	range temp=$(ndata*2+2)!wcol(3+ii*(ndata+2)+ndata);
+	sd=temp;
+	sd[l]$=temp[l]$;sd[c]$="nor_"+temp[c]$;
+}
 

@@ -2,14 +2,14 @@
 //This program is used to get the qz reference from raw data
 //*************************************************************************;
 //set parameters;
-string workbook_ori$="book8";//set the original workbook where raw data come.
-string workbook_now$="book9";//set the workbook where you need to operate
-string sample$="qz-h2o ";
+string workbook_ori$="book1";//set the original workbook where raw data come.
+string workbook_now$="book14";//set the workbook where you need to operate
+string sample$="qz-d2o ";
 string polar$="ssp ";
 string col_ori_wavelength$="a";//set the colume of wavelength in original qz sheet
 string col_ori_qz$="c";//set the colume of data in original qz sheet
-time_qz=5;//intergrated time of qz (s);
-energy_ir=7.2;//ir energy (mW)
+time_qz=1;//intergrated time of qz (s);
+energy_ir=9.5;//ir energy (mW)
 energy_800=11;//800 energy (mW)
 xgroup=4;//x group setted in CCD;
 //*************************************************************************

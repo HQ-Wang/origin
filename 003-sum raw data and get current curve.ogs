@@ -4,8 +4,8 @@
 //run only once
 newsheet name:="current";
 //........................................................................
-string workbook_now$="book9";//set the workbook where you need to operate
-string workbook_ori$="book8";//set the original workbook where raw data come.
+string workbook_now$="book14";//set the workbook where you need to operate
+string workbook_ori$="book1";//set the original workbook where raw data come.
 CV_gain=7;//set the gain level;
 nd2o=2;//set the cycle times;
 //..........................................................................

@@ -1,8 +1,8 @@
 ph=5.8;
-string date$="20160313";
-string tbook$="book3";
-string name$="ph$(ph)_(-1.2_0.4).dat";
-string samp$=date$+"_si100e2(smooth)";
+string date$="20140908";
+string tbook$="book14";
+string name$="ph$(ph)_(-1.2_0.4_re-calculation).dat";
+string samp$=date$+"_si100d4";
 //...............................................................................................
 string path$="D:\百度云同步盘\Fudan study\experiment\origin data\export file\"+date$+"\ph$(ph)\";
 string sheetd2o$="fitd2o1";

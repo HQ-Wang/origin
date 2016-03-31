@@ -1,5 +1,5 @@
 //parameters setting.modify every time.
-string workbook_now$="book4";//fitdata workbook.
+string workbook_now$="book12";//fitdata workbook.
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};//here the order is useless. the list is only used once for count;
 nvol=listvol.getsize();
@@ -105,16 +105,14 @@ legend.fsize=18;
 legend.y = layer.y.to - legend.dy*1 /100;
 legend.x = layer.x.from + legend.dx *50/ 100;
 
-layer.x.from=2800;
-layer.x.to=3750;
+layer.x.from=3000;
+layer.x.to=3800;
 layer.x.inc=200;
 
 page.active=1;
-layer.y.from=-1.5;
-layer.y.to=0.5;
+layer.y.from=-1.8;
+layer.y.to=1.5;
 layer.y.inc=0.5;
 
 //....................................................................................................
 
-#Command Error!
-#Command Error!

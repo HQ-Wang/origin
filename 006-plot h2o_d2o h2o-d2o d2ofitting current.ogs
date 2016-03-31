@@ -5,16 +5,16 @@
 //3,d2o's fitting
 //4,current
 //*************************************************************************************
-string workbook_now$="book9";//modify every time.fitdata workbook.
+string workbook_now$="book14";//modify every time.fitdata workbook.
 dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//set values of voltages in first cycle. modify every time.;
-dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
+dataset listvol2={-0.6,-0.4,-0.2};
 dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
 nvol1=listvol1.getsize();
 nvol2=listvol2.getsize();
 nvol3=listvol3.getsize();
 nd2o=2;//numbers of cycles of d2o.modify every time; ;
 ph=5.8;//set pH value.modify every time.;
-string samp$="si100d10(scratched)";//set your sample.modify every time.;
+string samp$="si100d4";//set your sample.modify every time.;
 //1............................................................................................
 newpanel 3 3 name:="1-"+samp$+" h2o/d2o";//plot the curves of h2o/d2o.
 layarrange row:=3 col:=3 xgap:=4 ygap:=4 left:=7 right:=7 top:=7 bottom:=7;

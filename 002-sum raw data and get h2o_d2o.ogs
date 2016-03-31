@@ -4,24 +4,25 @@
 //1,set all parameters at first part; 2,run second part once to build sheets;3, run third part to get data;
 
 //first part*************************************************************************************
-range rpage=[book9];//set the workbook where you need to operate
-string workbook_ori$="book8";//set the original workbook where raw data come.
-string samp$="si100d10(scratched)";//set the serial number of your sample.modify every time.;
+range rpage=[book14];//set the workbook where you need to operate
+string workbook_ori$="book1";//set the original workbook where raw data come.
+string samp$="si100d4";//set the serial number of your sample.modify every time.;
 ph=5.8;//set pH value.modify every time.;
 string polar$="ssp";//polarizer combination
-energy_ir=7.4;//ir energy (mW)
+energy_ir=10;//ir energy (mW)
 energy_800=11;//800 energy (mW)
 tps=1;//time per spectrum(minutes)
 xgroup=4;//x group setted in CCD
-scan_speed=50;//scan speed setted in CV (mV/s) 
+scan_speed=100;//scan speed setted in CV (mV/s) 
 string test_order$="d2o->h2o";//the test order
 
-nd2o=2;//set the cycle times
-dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//set values of different voltages at first cycle;
-dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
+nd2o=2;//set the cycle times;
+direction_scan=2;//the direction of voltage scan : "1" means from low to high such as -1.2v to 0.4v. "2" means reverse
+dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//set values of different voltages at first cycle from low to high and don't care about the direction of voltage scan;
+dataset listvol2={-0.6,-0.4,-0.2};
 dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
-nspec1=4;//set the number of spectra in each voltage at first cycle;
-nspec2=9;
+nspec1=3;//set the number of spectra in each voltage at first cycle;
+nspec2=7;
 nspec3=4;
 nvol1=listvol1.getsize();
 nvol2=listvol2.getsize();
@@ -79,9 +80,16 @@ for(kk=0;kk<nd2o;kk++)
 	{
 		range data=col($(ii+4));
 		data=waven*0;
+		pp=ii;
+		if(direction_scan==2)
+		{
+			pp=nvol$(kk+1)-1-ii;
+		}
+		//type "$(pp)";
 		for(jj=0;jj<nspec$(kk+1);jj++)//sum all spectra at the same voltage.
 		{
-			range temp=[workbook_ori$]sheet1$!col($(2+2*nspec$(kk+1)+ii*nspec$(kk+1)+jj));
+			
+			range temp=[workbook_ori$]sheet1$!col($(2+2*nspec$(kk+1)+pp*nspec$(kk+1)+jj));
 			data+=temp;
 			if(jj==0)//label.
 			{
@@ -128,9 +136,15 @@ for(kk=0;kk<nd2o;kk++)
 	{
 		range data=col($(ii+4));
 		data=waven*0;
+		pp=ii;
+		if(direction_scan==2)
+		{
+			pp=nvol$(kk+1)-1-ii;
+		}
 		for(jj=0;jj<nspec$(kk+1);jj++)
 		{
-			range temp=[workbook_ori$]sheet2$!col($(2+2*nspec$(kk+1)+ii*nspec$(kk+1)+jj));
+			range temp=[workbook_ori$]sheet2$!col($(2+2*nspec$(kk+1)+pp*nspec$(kk+1)+jj));
+			
 			data+=temp;
 			if(jj==0)
 			{
@@ -246,10 +260,10 @@ for(ii=0;ii<nvol1;ii++)
 		sntemp=2;
 	range dh=sheet3$!col($(ii+2));
 	dh=h2o$(sntemp)/d2o$(sntemp);
-	dh[l]$=h2o$(sntemp)[l]$;dh[c]$=smo_h2o/d2o_$(listvol1[ii],%2.1f)vto$(listvol1[ii+1],%2.1f)v_1min;
-	if(ii==0)
-	{
-		dh[c]$=smo_h2o/d2o_$(listvol1[ii+1],%2.1f)v_1min;
-	}
+	dh[l]$=h2o$(sntemp)[l]$;dh[c]$=h2o$(sntemp)[c]$+"_h2o/d2o";
+	//if(ii==0)
+	//{
+	//	dh[c]$=smo_h2o/d2o_$(listvol1[ii+1],%2.1f)v_1min;
+	//}
 }
 

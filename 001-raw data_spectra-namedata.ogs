@@ -3,28 +3,28 @@
 //The sheets of raw data should be imported as following order: 1st d2o raw data; 1st h2o raw data; 2nd d2o raw data;2nd h2o raw data;...at last is quartz
 //And in each sheet, data should be arranged as: 1st colume: wavelength(nm); next: ir raw data; next: 800 raw data; next: sfg raw data at different voltages.;
 //***********************************************************************
-range rpage=[book8];//set the workbook which will be edited.
-string samp$="si100d10(scratched)";//set the serial number of your sample.modify every time.;
+range rpage=[book1];//set the workbook which will be edited.
+string samp$="si100d4";//set the serial number of your sample.modify every time.;
 ph=5.8;//set pH value.modify every time.;
 string polar$="ssp_";//polarizer combination
-energy_ir=7.4;//ir energy (mW)
+energy_ir=10;//ir energy (mW)
 energy_800=11;//800 energy (mW)
 tps=1;//time per spectrum of sample(minutes);
 xgroup=4;//x group setted in CCD
-scan_speed=50;//scan speed setted in CV (mV/s) 
+scan_speed=100;//scan speed setted in CV (mV/s) 
 string test_order$="d2o->h2o";//the test order
 nd2o=2;//set the cycle times
 dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};//set values of different voltages at first cycle;
-dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
+dataset listvol2={-0.6,-0.4,-0.2};
 dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
-nspec1=4;//set the number of spectra in each voltage at first cycle.	
-nspec2=9;
+nspec1=3;//set the number of spectra in each voltage at first cycle.	
+nspec2=7;
 nspec3=nspec1;
 CV_gain=7;//set the gain level;
 
-tps_qz=5;//time per spectrum of quartz(s);
+tps_qz=1;//time per spectrum of quartz(s);
 xgroup_qz=4;//x group setted in CCD at quartz measurement;
-energy_ir_qz=7.2;//ir energy at quartz measurement(mW)
+energy_ir_qz=9.5;//ir energy at quartz measurement(mW)
 energy_800_qz=11;//800 energy at quartz measurement(mW);
 //****************************************************************;
 // run only once;
@@ -38,7 +38,7 @@ for(i=0;i<nd2o;i++)
 //1st col: d2o; 2nd col: h2o
 newsheet name:="current";
 newsheet name:="quartz";
-layer -d "sheet";
+layer -d "sheet1";
 
 //*****************************************************************;
 rpage.longname$="raw data "+polar$+samp$+"_ph$(ph)_ir$(energy_ir)mw(gase)-vis$(energy_800)mw_$(tps)min_$(xgroup)_$(scan_speed)mvs-1_"+test_order$;//modify every time
@@ -97,3 +97,4 @@ page.active$="quartz";
 col(1)[l]$=wavelength;col(1)[u]$=nm;
 col(3)[l]$=counts;col(3)[c]$=polar$+"qz/h2o-ph$(ph)-$(tps_qz)s-ir$(energy_ir_qz)mW-vis$(energy_800_qz)mW";
 
+#Command Error!

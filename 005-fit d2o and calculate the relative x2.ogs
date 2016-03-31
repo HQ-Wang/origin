@@ -1,16 +1,11 @@
 //************************************************************************************************
-//This program is used to fit the d2o curve at different voltages with gaussion mode
+//This program is used to fit the d2o curve at different voltages with gaussion mode only with the data in d2o1
 //************************************************************************************************
 //choose the d2o's data which used to do gaussion fitting
 ph=5.8;//ph value.
 dataset listvol1={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
-//dataset listvol2={-0.8,-0.6,-0.4,-0.2,0};
-//dataset listvol3={-0.8,-0.6,-0.4,-0.2,0};
 nvol1=listvol1.getsize();
-//nvol2=listvol2.getsize();
-//nvol3=listvol3.getsize();
-string samp$="si100e2(scratched)";
-//string refbook$="book3";nrefvol=nvol1;//set your reference X2.modify every time.;
+string samp$="si100d4";
 //..................................................................................................;
 // do gauss fitting to the spectra of d2o
 loop(ii,$(4+nvol1),$(3+nvol1*2))
