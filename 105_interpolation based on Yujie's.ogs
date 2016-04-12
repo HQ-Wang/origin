@@ -141,4 +141,47 @@ for(i=0;i<NUM_LIST;i++)
 	IM_X2_EFF_S[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S[u]$=IM_X2_EFF_B[u]$;IM_X2_EFF_S[c]$=Im_S $(LIST_VOL[1+i])V;
 	IM_X2_EFF_S_SD[l]$=X\=(eff_H\-(2)O(S),(2))(ssp);IM_X2_EFF_S_SD[u]$=IM_X2_EFF_B_SD[u]$;IM_X2_EFF_S_SD[c]$=IM_S_SD $(LIST_VOL[1+i])V;
 }
+//..............................................................................................................;
+//integrate the positive band and negative band in imaginary X2_eff_h2o_total;
+range vol=X2eff_h2o_surface_imarea!col(1);
+vol[l]$=voltage; vol[u]$=V;
+for(ii=0;ii<nvol;ii++)//set the values of voltages as x-axis
+{
+	m=listvol[ii+1];
+	vol[$(ii+1)]=m;
+	if(m<0.0001&&m>-0.0001)
+	{
+		vol[$(ii+1)]=0;
+	}
+}
+range imarea_all=X2eff_h2o_surface_imarea!col(2);
+range imarea_plus=X2eff_h2o_surface_imarea!col(3);
+range imarea_minus=X2eff_h2o_surface_imarea!col(4);
+imarea_plus[l]$=area of [X\+((2))\-(eff-h2o)]; imarea_plus[u]$=a.u.; imarea_plus[c]$=Im_eff_h2o_surface_positive;
+imarea_minus[l]$=area of [X\+((2))\-(eff-h2o)]; imarea_minus[u]$=a.u.; imarea_minus[c]$=Im_eff_h2o_surface_negative;
+imarea_all[l]$=area of [X\+((2))\-(eff-h2o)]; imarea_all[u]$=a.u.; imarea_all[c]$=Im_eff_h2o_surface_all;
+range c=SHEET_X2EFF_S$!col(1);
+for(jj=0;jj<nvol;jj++)
+{
+	
+	range im_tot=SHEET_X2EFF_S$!col($(jj*4+7));
+	area_plus=0;
+	area_minus=0;
+	area_all=0;
+	for(ii=0;ii<im_tot.GetSize();ii++)
+	{
+		area_all+=im_tot[$(ii+1)];
+		if(im_tot[$(ii+1)]>=0)
+		{
+			area_plus+=im_tot[$(ii+1)];
+		}
+		else
+		{
+			area_minus+=im_tot[$(ii+1)];
+		}
+	}
+	imarea_plus[$(jj+1)]=area_plus*(c[2]-c[1]);
+	imarea_minus[$(jj+1)]=area_minus*(c[2]-c[1]);
+	imarea_all[$(jj+1)]=area_all*(c[2]-c[1]);
+}
 

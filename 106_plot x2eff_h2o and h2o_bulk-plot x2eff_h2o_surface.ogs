@@ -1,5 +1,5 @@
 //parameters setting.modify every time.
-string workbook_now$="book12";//fitdata workbook.
+string workbook_now$="book4";//fitdata workbook.
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};//here the order is useless. the list is only used once for count;
 nvol=listvol.getsize();
@@ -115,4 +115,41 @@ layer.y.to=1.5;
 layer.y.inc=0.5;
 
 //....................................................................................................
+//...............................................................................................
+newpanel 1 1 name:="4_imarea_x2eff_h2o_surface_ph$(ph) x$(nusemo)";
+layarrange row:=1 col:=1 xgap:=0 ygap:=0 left:=12 right:=12 top:=12 bottom:=12;
+siz=9;
+for (ii=0;ii<3;ii++)
+{
+	int col;
+	switch (ii)
+	{
+		case 0:
+		col=1;//black
+		break;
+		case 1:
+		col=2;//red
+		break;
+		case 2:
+		col=4;//blus
+		break;
+	}
+	plotxy iy:=[workbook_now$]X2eff_h2o_surface_imarea!(wcol(1),wcol(2+ii)) plot:=202 size:=$(siz) color:=$(col) ogl:=1;//imarea vs voltages
+}
 
+loop(ii,1,1)
+{
+	page.active=$(ii);
+	legend.fsize=18;
+	legend.y = layer.y.to - legend.dy*1 /15;
+	legend.x = layer.x.from + legend.dx *11/ 15;
+	layer.x.from=-1.3;
+	layer.x.to=0.5;
+	layer.x.inc=0.4;
+}
+
+
+page.active=1;
+layer.y.from=-650;
+layer.y.to=300;
+layer.y.inc=200;

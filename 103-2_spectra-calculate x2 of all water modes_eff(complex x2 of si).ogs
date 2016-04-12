@@ -1,0 +1,60 @@
+
+
+nmo=5;usenmo=5;//nmo means total numbers of modes in function.usenmo means numbers of useful modes.;
+dataset listvol={-1.2, 0.4};
+nvol=listvol.getsize();
+dataset listdeg={0,30,60,90};
+ndeg=listdeg.getsize();
+nfit=1;
+ndata=1;//numbers of data used to do summation. modify every time;
+//...............................................................................................;
+//process the data based on the results of fitting. 
+//arrange the fitcurves and their seperately modes.
+//to get the X2_eff_h2o
+
+for(kk=0;kk<nvol;kk++)
+{
+	range waven=fith2o/d2o_eff_$(listvol[kk+1])v!col(1);
+	range temp=fitnlcurve1!col(1);
+	waven=temp;
+	range temp=nor_h2o/d2o!col(1);
+	waven[l]$=temp[l]$;waven[u]$=temp[u]$;
+	for(jj=0;jj<ndeg;jj++)
+	{
+		m=listdeg[jj+1];
+		range fit=fith2o/d2o_eff_$(listvol[kk+1])v!col($(jj*(4+usenmo*3)+3));
+		range temp=fitnlcurve$(jj+1)!col(2);
+		fit=temp;
+		fit[l]$=|X\+((2))\-(eff-si)+X\+((2))\-(eff-h2o)|\+(2)/|X\+((2))\-(eff-si)|\+(2);fit[c]$=fitcurve_$(m)degree_$(listvol[kk+1])v;
+		if(m<0.01&&m>-0.01)
+		{
+			fit[c]$=fitcurve_0degree;
+		}
+		range re_tot=fith2o/d2o_eff_$(listvol[kk+1])v!col($(jj*(4+usenmo*3)+4)); 
+		range im_tot=fith2o/d2o_eff_$(listvol[kk+1])v!col($(jj*(4+usenmo*3)+5));
+		re_tot=fit*0;
+		im_tot=fit*0;
+		re_tot[l]$=[X\+((2))\-(eff-h2o)];re_tot[u]$=10\+(-21)m\+(2)V\+(-1);re_tot[c]$="Re_total "+fit[c]$;
+		im_tot[l]$=[X\+((2))\-(eff-h2o)];im_tot[u]$=10\+(-21)m\+(2)V\+(-1);im_tot[c]$="Im_total "+fit[c]$;
+		for(ii=0;ii<usenmo;ii++)
+		{
+			a=fitnl$(jj+1)!cell($(kk*(3+3*nmo)+ii*3+4),8);
+			w=fitnl$(jj+1)!cell($(kk*(3+3*nmo)+ii*3+5),8);
+			t=fitnl$(jj+1)!cell($(kk*(3+3*nmo)+ii*3+6),8);
+			range x22_mo=fith2o/d2o_eff_$(listvol[kk+1])v!col($(jj*(4+usenmo*3)+ii+6));
+			range re_mo=fith2o/d2o_eff_$(listvol[kk+1])v!col($(jj*(4+usenmo*3)+ii+6+usenmo));
+			range im_mo=fith2o/d2o_eff_$(listvol[kk+1])v!col($(jj*(4+usenmo*3)+ii+6+usenmo*2));
+			x22_mo=(a*(waven-w)/((waven-w)^2+t^2))^2+(a*t/((waven-w)^2+t^2))^2;
+			re_mo=a*(waven-w)/((waven-w)^2+t^2);
+			re_tot+=re_mo;
+			im_mo=-a*t/((waven-w)^2+t^2);
+			im_tot+=im_mo;
+			x22_mo[l]$=|X\+((2))\-(eff-h2o)|\+(2);x22_mo[u]$=10\+(-42)m\+(4)V\+(-2);x22_mo[c]$=mode$(ii+1)($(w)cm\+(-1))_$(m)degree_$(listvol[kk+1])v;
+			re_mo[l]$=[X\+((2))\-(eff-h2o)];re_mo[u]$=10\+(-21)m\+(2)V\+(-1);re_mo[c]$=Re_mode$(ii+1)($(w)cm\+(-1))_$(m)degree_$(listvol[kk+1])v;
+			im_mo[l]$=[X\+((2))\-(eff-h2o)];im_mo[u]$=10\+(-21)m\+(2)V\+(-1);im_mo[c]$=Im_mode$(ii+1)($(w)cm\+(-1))_$(m)degree_$(listvol[kk+1])v;
+		}
+		
+		
+	}
+}
+
