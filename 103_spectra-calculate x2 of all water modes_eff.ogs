@@ -4,8 +4,9 @@ nmo=5;usenmo=5;//nmo means total numbers of modes in function.usenmo means numbe
 //dataset listvol={0.4,0.2,0,-0.2,-0.4,-0.6,-0.8,-1,-1.2};
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
-nfit=1;
-ndata=1;//numbers of data used to do summation. modify every time;
+nfit=8;
+fit_method=1;//if consider the phase angle of silicon, fit_method=1; else fit_method=0.
+ndata=2;//numbers of data used to do summation. modify every time;
 //...............................................................................................;
 //process the data based on the results of fitting. 
 //arrange the fitcurves and their seperately modes.
@@ -13,7 +14,7 @@ ndata=1;//numbers of data used to do summation. modify every time;
 range waven=fith2o/d2o$(nfit)_eff!col(1);
 range temp=fitnlcurve$(nfit)!col(1);
 waven=temp;
-range temp=h2o/d2o!col(1);
+range temp=nor_h2o/d2o!col(1);
 waven[l]$=temp[l]$;waven[u]$=temp[u]$;
 for(jj=0;jj<nvol;jj++)
 {
@@ -34,9 +35,9 @@ for(jj=0;jj<nvol;jj++)
 	im_tot[l]$=[X\+((2))\-(eff-h2o)];im_tot[u]$=10\+(-21)m\+(2)V\+(-1);im_tot[c]$="Im_total "+fit[c]$;
 	for(ii=0;ii<usenmo;ii++)
 	{
-		a=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+3),8);
-		w=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+4),8);
-		t=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+5),8);
+		a=fitnl$(nfit)!cell($(jj*(2+fit_method+3*nmo)+ii*3+3+fit_method),8);
+		w=fitnl$(nfit)!cell($(jj*(2+fit_method+3*nmo)+ii*3+4+fit_method),8);
+		t=fitnl$(nfit)!cell($(jj*(2+fit_method+3*nmo)+ii*3+5+fit_method),8);
 		range x22_mo=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+ii+6));
 		range re_mo=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+ii+6+usenmo));
 		range im_mo=fith2o/d2o$(nfit)_eff!col($(jj*(4+usenmo*3)+ii+6+usenmo*2));
@@ -99,10 +100,10 @@ for(ii=0;ii<nvol;ii++)
 	am_sd_tot=0;
 	for(jj=0;jj<usenmo;jj++)
 	{
-		a=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+3),8);
-		a_sd=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+3),9);
-		w=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+4),8);
-		t=fitnl$(nfit)!cell($(ii*(2+3*nmo)+jj*3+5),8);
+		a=fitnl$(nfit)!cell($(ii*(2+fit_method+3*nmo)+jj*3+3+fit_method),8);
+		a_sd=fitnl$(nfit)!cell($(ii*(2+fit_method+3*nmo)+jj*3+3+fit_method),9);
+		w=fitnl$(nfit)!cell($(ii*(2+fit_method+3*nmo)+jj*3+4+fit_method),8);
+		t=fitnl$(nfit)!cell($(ii*(2+fit_method+3*nmo)+jj*3+5+fit_method),8);
 		are=-3.14*a;//here  multiply "-3.14" to get the area of imaginary part in lorentz mode;
 		are_sd=-3.14*a_sd;
 		FWHM=2*t;//here multiply "2" to get FWHM;
@@ -130,7 +131,7 @@ for(ii=0;ii<nvol;ii++)
 range waven=fith2o/d2o$(nfit)_eff_sd!col(1);
 range temp=fitnlcurve$(nfit)!col(1);
 waven=temp;
-range temp=h2o/d2o!col(1);
+range temp=nor_h2o/d2o!col(1);
 waven[l]$=temp[l]$;waven[u]$=temp[u]$;
 for(jj=0;jj<nvol;jj++)
 {
@@ -138,7 +139,7 @@ for(jj=0;jj<nvol;jj++)
 	range fit=fith2o/d2o$(nfit)_eff_sd!col($(jj*7+3));
 	range temp=fitnlcurve$(nfit)!col($(jj*4+2));
 	range fit_sd= fith2o/d2o$(nfit)_eff_sd!col($(jj*7+4));
-	range temp_sd=h2o/d2o!col($(jj*(ndata+2)+ndata+3));
+	range temp_sd=nor_h2o/d2o!col($(jj*(ndata+2)+ndata+3));
 	fit=temp;
 	interp1 ix:=fith2o/d2o$(nfit)_eff_sd!col(1) iy:=temp_sd ox:=fit_sd;
 	fit[l]$=|X\+((2))\-(eff-si)+X\+((2))\-(eff-h2o)|\+(2)/|X\+((2))\-(eff-si)|\+(2);fit[c]$=fitcurve_$(m,.1)v;
@@ -221,3 +222,7 @@ for(jj=0;jj<nvol;jj++)
 }
 
 
+#Command Error!
+#Command Error!
+#Command Error!
+#Command Error!

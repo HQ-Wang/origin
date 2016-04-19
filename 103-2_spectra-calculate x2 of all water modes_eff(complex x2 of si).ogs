@@ -1,9 +1,9 @@
 
 
 nmo=5;usenmo=5;//nmo means total numbers of modes in function.usenmo means numbers of useful modes.;
-dataset listvol={-1.2, 0.4};
+dataset listvol={-1.2, 0.4,-0.4};
 nvol=listvol.getsize();
-dataset listdeg={0,30,60,90};
+dataset listdeg={0,30,60,90,-30,-60,-90};
 ndeg=listdeg.getsize();
 nfit=1;
 ndata=1;//numbers of data used to do summation. modify every time;
