@@ -1,11 +1,11 @@
 
-string workbook_now$="book5";//modify every time.fitdata workbook.
+string workbook_now$="book13";//modify every time.fitdata workbook.
 //dataset listvol={0.8,0.6,0.4,0.2,0,-0.2,-0.4,-0.6,-0.8};
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
 ph=5.8;//set pH value.modify every time.;
-string samp$="si100d10(smooth)";//set your sample.modify every time.;
-int ndata=1;
+string samp$="si100d";//set your sample.modify every time.;
+int ndata=2;
 
 //............................................................................................;
 //1_voltage dependence of si/d2o sfg signal

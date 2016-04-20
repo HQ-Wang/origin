@@ -1,11 +1,11 @@
 //parameters setting.modify every time.
-string workbook_now$="book3";//fitdata workbook.
+string workbook_now$="book13";//fitdata workbook.
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
 ph=5.8;//set pH value.
-int ndata=1;//the numbers of import data
+int ndata=2;//the numbers of import data
 nusemo=5;
-nfit=1;
+nfit=9;
 //.............................................................................................;
 //plot the curves of h2o/d2o and total x2eff_h2o.
 newpanel 3 3 name:="2-1_total x2_eff_h2o ph$(ph) x$(nusemo)";
@@ -223,19 +223,19 @@ layer.y.to=4000;
 layer.y.inc=200;
 
 page.active=2;
-layer.y.from=70;
-layer.y.to=180;
+layer.y.from=180;
+layer.y.to=350;
 layer.y.inc=20;
 
 page.active=3;
-layer.y.from=-180;
-layer.y.to=150;
-layer.y.inc=50;
+layer.y.from=-900;
+layer.y.to=600;
+layer.y.inc=200;
 
 page.active=4;
-layer.y.from=-1.2;
-layer.y.to=1;
-layer.y.inc=0.4;
+layer.y.from=-2;
+layer.y.to=1.5;
+layer.y.inc=0.5;
 
 //.................................................................................................;
 newpanel 1 1 name:="2-5-2_voltage dependence of modes_ph$(ph) x$(nusemo)";
@@ -281,9 +281,49 @@ loop(ii,1,1)
 
 
 page.active=1;
-layer.y.from=-1.5;
+layer.y.from=-2;
 layer.y.to=1.5;
 layer.y.inc=0.5;
+
+
+//.....................................................................................................;
+newpanel 1 1 name:="2-5-3_voltage dependence of im x2 at specific wavelength_ph$(ph) x$(nusemo)";
+layarrange row:=1 col:=1 xgap:=0 ygap:=0 left:=12 right:=12 top:=12 bottom:=12;
+siz=9;
+for (ii=0;ii<3;ii++)
+{
+	int col;
+	switch (ii)
+	{
+		case 0:
+		col=1;//black
+		break;
+		case 1:
+		col=2;//red
+		break;
+		case 2:
+		col=4;//blus
+		break;
+	}
+	plotxy iy:=[workbook_now$]fith2o/d2o$(nfit)_eff_imarea!(wcol(1),wcol(5+ii)) plot:=202 size:=$(siz) color:=$(col) ogl:=1;//im x2 at specific wavelength vs voltages
+}
+
+loop(ii,1,1)
+{
+	page.active=$(ii);
+	legend.fsize=18;
+	legend.y = layer.y.to - legend.dy*1 /15;
+	legend.x = layer.x.from + legend.dx *11/ 15;
+	layer.x.from=-1.3;
+	layer.x.to=0.5;
+	layer.x.inc=0.4;
+}
+
+
+page.active=1;
+layer.y.from=-1.5;
+layer.y.to=0.5;
+layer.y.inc=1;
 
 //...................................................................................................;
 newpanel 2 1 name:="2-6_voltage dependence of total modes_ph$(ph) x$(nusemo)";
@@ -304,37 +344,18 @@ loop(ii,1,2)
 }
 
 page.active=1;
-layer.y.from=-100;
-layer.y.to=200;
+layer.y.from=-900;
+layer.y.to=100;
 layer.y.inc=100;
 
 page.active=2;
-layer.y.from=-0.6;
-layer.y.to=1.5;
+layer.y.from=-1.8;
+layer.y.to=0.5;
 layer.y.inc=0.5;
 //....................................................................................................
-newpanel 1 1 name:="2-7_im_x2eff_h2o PH$(ph)";
-
-for (ii=0; ii<nvol; ii++)
-{
-	plotxy iy:=([workbook_now$]fith2o/d2o$(nfit)_eff_sd!wcol(1),[workbook_now$]fith2o/d2o$(nfit)_eff_sd!wcol(7+ii*7),[workbook_now$]fith2o/d2o$(nfit)_eff_sd!wcol(8+ii*7)) plot:=202 size:=5 color:=$(ii+1) ogl:=1;
-}
-
-legend.fsize=18;
-legend.y = layer.y.to - legend.dy*1 /100;
-legend.x = layer.x.from + legend.dx *50/ 100;
-
-layer.x.from=3000;
-layer.x.to=3800;
-layer.x.inc=200;
-
-page.active=1;
-layer.y.from=-1.3;
-layer.y.to=1.2;
-layer.y.inc=0.5;
 
 //...............................................................................................
-newpanel 1 1 name:="2-8_voltage dependence of imarea_ph$(ph) x$(nusemo)";
+newpanel 1 1 name:="2-7_voltage dependence of imarea_ph$(ph) x$(nusemo)";
 layarrange row:=1 col:=1 xgap:=0 ygap:=0 left:=12 right:=12 top:=12 bottom:=12;
 siz=9;
 for (ii=0;ii<3;ii++)
@@ -368,6 +389,6 @@ loop(ii,1,1)
 
 
 page.active=1;
-layer.y.from=-600;
+layer.y.from=-700;
 layer.y.to=300;
 layer.y.inc=200;

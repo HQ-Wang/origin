@@ -4,7 +4,7 @@ nmo=5;usenmo=5;//nmo means total numbers of modes in function.usenmo means numbe
 //dataset listvol={0.4,0.2,0,-0.2,-0.4,-0.6,-0.8,-1,-1.2};
 dataset listvol={-1.2,-1.0,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4};
 nvol=listvol.getsize();
-nfit=8;
+int nfit=9;
 fit_method=1;//if consider the phase angle of silicon, fit_method=1; else fit_method=0.
 ndata=2;//numbers of data used to do summation. modify every time;
 //...............................................................................................;
@@ -162,9 +162,9 @@ for(jj=0;jj<nvol;jj++)
 	im_tot_sd[l]$=[X\+((2))\-(eff-h2o)];im_tot_sd[u]$=10\+(-21)m\+(2)V\+(-1);im_tot_sd[c]$="Im_total_sd "+fit[c]$;
 	for(ii=0;ii<usenmo;ii++)
 	{
-		a=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+3),8);
-		w=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+4),8);
-		t=fitnl$(nfit)!cell($(jj*(2+3*nmo)+ii*3+5),8);
+		a=fitnl$(nfit)!cell($(jj*(2+fit_method+3*nmo)+ii*3+3+fit_method),8);
+		w=fitnl$(nfit)!cell($(jj*(2+fit_method+3*nmo)+ii*3+4+fit_method),8);
+		t=fitnl$(nfit)!cell($(jj*(2+fit_method+3*nmo)+ii*3+5+fit_method),8);
 		re_mo=a*(waven-w)/((waven-w)^2+t^2);
 		re_tot+=re_mo;
 		im_mo=-a*t/((waven-w)^2+t^2);
@@ -179,6 +179,8 @@ for(jj=0;jj<nvol;jj++)
 }
 //....................................................................................................;
 //integrate the positive band and negative band in imaginary X2_eff_h2o_total;
+
+
 range vol=fith2o/d2o$(nfit)_eff_imarea!col(1);
 vol[l]$=voltage;vol[u]$=V;
 for(ii=0;ii<nvol;ii++)//set the values of voltages as x-axis
@@ -222,7 +224,40 @@ for(jj=0;jj<nvol;jj++)
 }
 
 
-#Command Error!
-#Command Error!
-#Command Error!
-#Command Error!
+set_wavelength1=3100;
+set_wavelength2=3300;
+set_wavelength3=3500;
+range im_wavelength1=fith2o/d2o$(nfit)_eff_imarea!col(5);
+range im_wavelength2=fith2o/d2o$(nfit)_eff_imarea!col(6);
+range im_wavelength3=fith2o/d2o$(nfit)_eff_imarea!col(7);
+im_wavelength1[l]$= [X\+((2))\-(eff-h2o)]; im_wavelength1[u]$=10\+(-21)m\+(2)V\+(-1); im_wavelength1[c]$=Im_X2_eff_h2o_total_@$(set_wavelength1)cm\+(-1);
+im_wavelength2[l]$= [X\+((2))\-(eff-h2o)]; im_wavelength2[u]$=10\+(-21)m\+(2)V\+(-1); im_wavelength2[c]$=Im_X2_eff_h2o_total_@$(set_wavelength2)cm\+(-1);
+im_wavelength3[l]$= [X\+((2))\-(eff-h2o)]; im_wavelength3[u]$=10\+(-21)m\+(2)V\+(-1); im_wavelength3[c]$=Im_X2_eff_h2o_total_@$(set_wavelength3)cm\+(-1);
+string sheet1$ = fith2o/d2o$(nfit)_eff_sd;
+page.active$="fith2o/d2o$(nfit)_eff_sd";
+for(jj=0;jj<c.GetSize()-1;jj++)
+{
+	test1=col(1)[$(jj+1)];
+	test2=col(1)[$(jj+2)];
+	if(test1<$(set_wavelength1)&&test2>$(set_wavelength1))
+	{
+		for(ii=0;ii<nvol;ii++)
+		{
+			im_wavelength1[$(ii+1)]=cell($(jj+1),$(ii*7+7));
+		}
+	}
+	if(test1<$(set_wavelength2)&&test2>$(set_wavelength2))
+	{
+		for(ii=0;ii<nvol;ii++)
+		{
+			im_wavelength2[$(ii+1)]=cell($(jj+1),$(ii*7+7));
+		}
+	}
+	if(test1<$(set_wavelength3)&&test2>$(set_wavelength3))
+	{
+		for(ii=0;ii<nvol;ii++)
+		{
+			im_wavelength3[$(ii+1)]=cell($(jj+1),$(ii*7+7));
+		}
+	}
+}
