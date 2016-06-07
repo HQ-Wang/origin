@@ -1,0 +1,118 @@
+//*************************global variables************************************;
+//string sheet_ori$="air/qz";
+string sheet_ori$="si/qz";
+dataset list_angle = {81,82,83,84,85,86,87,88,89,90,91};
+//dataset list_angle = {54,56,58,60,62,54,52,50,48,46};
+n_angle = list_angle.getsize();
+string workbook_ori$="book1";
+ndata=2;
+string workbook_now$="book2";
+tps_qz=1;//time per spectrum of qz (s);
+range rpage=[workbook_ori$];
+rpage.longname$=raw data $(tps_qz)s 1200 ssp ir11vis7.3 group1;
+range rpage=[workbook_now$];
+rpage.longname$=air/qz and si/qz;
+//*************************name raw data************************************;
+for(jj=0;jj<ndata;jj++)
+{
+	range wavel = [workbook_ori$]sheet_ori$+"$(jj+1)"!col(1);
+	wavel[l]$ = wavelength;
+	wavel[u]$ = nm;
+
+	for(ii=0;ii<n_angle;ii++)
+	{
+		range temp = [workbook_ori$]sheet_ori$+"$(jj+1)"!col($(ii+2));
+		temp[l]$=counts;
+		temp[c]$=sheet_ori$+"-sfg-pol-angle-$(list_angle[ii+1])";
+	}
+}
+
+
+
+//*************************process*******************************;
+
+range wavel = [workbook_ori$]sheet_ori$+"1"!col(1);
+range waven = [workbook_now$]sheet_ori$!col(1);
+waven = (1/wavel-1/800)*1e7;
+waven[l]$ = wavenumber;
+waven[u]$ = cm\+(-1);
+
+for(ii=0;ii<n_angle;ii++)
+{
+	
+	range data=[workbook_now$]sheet_ori$!col($(ii+2));
+	data=0*waven;
+	for(jj=0;jj<ndata;jj++)
+	{
+		range temp=[workbook_ori$]sheet_ori$+"$(jj+1)"!col($(ii+2));
+		data+=temp;
+		data[l]$=temp[l]$;
+		data[c]$=temp[c]$;
+	}
+	data=data/tps_qz/ndata;
+	data[u]$=s\+(-1);
+
+	range sd=[workbook_now$]sheet_ori$!col($(ii+2+n_angle+1));
+	sd=0*waven;
+	for(jj=0;jj<ndata;jj++)
+	{
+		range temp=[workbook_ori$]sheet_ori$+"$(jj+1)"!col($(ii+2));
+		sd+=(temp/tps_qz-data)^2;
+	}
+	sd=(sd/$(ndata-1))^0.5;
+	sd[l]$=data[l]$;
+	sd[c]$="sd-"+data[c]$;
+	sd[u]$=s\+(-1);
+}
+range angle=[workbook_now$]sheet_ori$!col($(4+n_angle*2));
+range data_integ=[workbook_now$]sheet_ori$!col($(5+n_angle*2));
+angle[l]$=angle_sfg_pol;
+angle[u]$=rad;
+data_integ[l]$=integrated area;
+data_integ[u]$=a.u.;
+data_integ[c]$=sheet_ori$;
+for(ii=0;ii<n_angle;ii++)
+{
+	angle[ii+1]=list_angle[ii+1]/180*pi;
+	integ1 iy:=[workbook_now$]sheet_ori$!col($(ii+2)) oy:=none area:=data_integ[ii+1];
+	
+}
+data_integ=abs(data_integ);
+//************************extract the counts per second at specified wavenumber**********************
+range angle2=[workbook_now$]sheet_ori$!col($(7+n_angle*2));
+angle2[l]$=angle_vis_pol;
+angle2[u]$=rad;
+for(ii=0;ii<n_angle;ii++)
+{
+	angle2[ii+1]=list_angle[ii+1]/180*pi;	
+}
+
+set_wavenumber1=3300;
+set_width1=100;
+range data_setwn=[workbook_now$]sheet_ori$!col($(8+n_angle*2));
+data_setwn[l]$=counts;
+data_setwn[u]$=s\+(-1);
+data_setwn[c]$=sheet_ori$+"@$(set_wavenumber1)cm\+(-1)";
+
+
+page.active$=sheet_ori$;
+range c=[workbook_now$]sheet_ori$!col(1);
+for(jj=0;jj<c.GetSize()-1;jj++)
+{
+	test1=col(1)[$(jj+1)];
+	test2=col(1)[$(jj+2)];
+	if(test1>$(set_wavenumber1)&&test2<$(set_wavenumber1))
+	{
+		for(ii=0;ii<n_angle;ii++)
+		{
+			sum=0;
+			for(kk=0;kk<set_width1;kk++)
+			{
+				sum+=cell($(jj+1+kk-set_width1/2),$(ii+2))
+			}
+			data_setwn[$(ii+1)]=sum/set_width1;
+		}
+	}
+}
+
+

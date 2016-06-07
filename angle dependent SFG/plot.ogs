@@ -1,0 +1,55 @@
+
+string workbook_now$="book2";//modify every time.fitdata workbook.
+dataset list_angle = {81,82,83,84,85,86,87,88,89,90,91};
+n_angle = list_angle.getsize();
+string samp$="si100d4";//set your sample.modify every time.;
+//............................................................................................;
+
+//.......................................................................................;
+//1-1 plot all spectra of air/qz in one layer 
+newpanel name:="1-1 all-spectra air/qz";
+for (ii=0; ii<n_angle; ii++)
+{
+plotxy iy:=([workbook_now$]air/qz!wcol(1),[workbook_now$]air/qz!wcol(2+ii),[workbook_now$]air/qz!wcol(3+n_angle+ii)) plot:=202 size:=5 color:=$(ii+1) ogl:=1;
+}
+
+layer.x.from=2800;
+layer.x.to=3800;
+layer.x.inc=200;
+layer.y.from=-500;
+
+//....................................................................................................;
+//1-2 plot all curves of intergrated air/qz in one layer for fitting
+newpanel name:="1-2_inter area air/qz";
+plotxy iy:=([workbook_now$]air/qz!wcol(4+n_angle*2),[workbook_now$]air/qz!wcol(5+n_angle*2)) plot:=201 size:=9 color:=1 ogl:=1;
+layer.x.inc=2;
+//....................................................................................................;
+//1-3 plot all curves of specific wavenumber air/qz in one layer for fitting;
+set_wn=3300;
+newpanel name:="1-3_air/qz@$(set_wn)cm-1";
+plotxy iy:=([workbook_now$]air/qz!wcol(7+n_angle*2),[workbook_now$]air/qz!wcol(8+n_angle*2)) plot:=201 size:=9 color:=1 ogl:=1;
+layer.x.inc=2;
+//.......................................................................................;
+//2-1 plot all spectra of si/qz in one layer 
+newpanel name:="2-1 all-spectra si/qz";
+for (ii=0; ii<n_angle; ii++)
+{
+plotxy iy:=([workbook_now$]si/qz!wcol(1),[workbook_now$]si/qz!wcol(2+ii),[workbook_now$]si/qz!wcol(3+n_angle+ii)) plot:=202 size:=5 color:=$(ii+1) ogl:=1;
+}
+
+layer.x.from=2800;
+layer.x.to=3800;
+layer.x.inc=200;
+layer.y.from=-500;
+//....................................................................................................;
+//2-2 plot all curves of intergrated si/qz in one layer for fitting
+newpanel name:="2-2_inter area si/qz";
+plotxy iy:=([workbook_now$]si/qz!wcol(4+n_angle*2),[workbook_now$]si/qz!wcol(5+n_angle*2)) plot:=201 size:=9 color:=1 ogl:=1;
+layer.x.inc=2;
+//....................................................................................................;
+//2-3 plot all curves of specific wavenumber si/qz in one layer for fitting;
+set_wn=3300;
+newpanel name:="2-3_si/qz@$(set_wn)cm-1";
+plotxy iy:=([workbook_now$]si/qz!wcol(7+n_angle*2),[workbook_now$]si/qz!wcol(8+n_angle*2)) plot:=201 size:=9 color:=1 ogl:=1;
+layer.x.inc=2;
+

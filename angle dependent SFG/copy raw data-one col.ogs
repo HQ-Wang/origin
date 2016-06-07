@@ -1,0 +1,30 @@
+//*************************global variables************************************;
+string sheet_ori$="si/fs";
+string workbook_ori$="book1";
+string workbook_now$="book2";
+tps_si=60;//time per spectrum of qz (s);
+//*************************name raw data************************************;
+range wavel = [workbook_ori$]sheet_ori$!col(1);
+wavel[l]$ = wavelength;
+wavel[u]$ = nm;
+
+
+range temp = [workbook_ori$]sheet_ori$!col(2);
+temp[l]$=counts;
+temp[u]$=min\+(-1);
+temp[c]$=sheet_ori$+"-sfg-pol-angle-86";
+
+//*************************process*******************************;
+
+range wavel = [workbook_ori$]sheet_ori$!col(1);
+range waven = [workbook_now$]sheet_ori$!col(1);
+waven = (1/wavel-1/800)*1e7;
+waven[l]$ = wavenumber;
+waven[u]$ = cm\+(-1);
+	
+range data=[workbook_now$]sheet_ori$!col(2);
+range temp=[workbook_ori$]sheet_ori$!col(2);
+data=temp/tps_si;
+data[l]$=temp[l]$;
+data[c]$=temp[c]$;
+data[u]$=s\+(-1);
